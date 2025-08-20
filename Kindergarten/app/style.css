@@ -1,0 +1,249 @@
+/* Kiddy Learning Hub - Main Navigation Styles */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Fredoka One', 'Comic Sans MS', cursive, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    height: 100vh;
+    padding: 15px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    max-width: 1100px;
+    width: 100%;
+    height: 90vh;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 25px;
+    padding: 25px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Header Styles */
+.header {
+    text-align: center;
+    margin-bottom: 25px;
+    flex-shrink: 0;
+}
+
+.main-title {
+    font-size: 2.8em;
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: rainbowText 3s ease-in-out infinite;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    font-size: 1.2em;
+    color: #666;
+    font-weight: normal;
+}
+
+/* Apps Grid */
+.apps-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    flex: 1;
+    align-content: center;
+}
+
+.app-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 200px;
+}
+
+.app-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    border-color: #4ecdc4;
+}
+
+.app-card.coming-soon {
+    opacity: 0.7;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.app-card.coming-soon:hover {
+    transform: none;
+    border-color: transparent;
+}
+
+.app-icon {
+    font-size: 4em;
+    margin-bottom: 15px;
+    display: block;
+    animation: bounce 2s infinite;
+}
+
+.app-title {
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 10px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.app-description {
+    font-size: 1em;
+    color: #666;
+    margin-bottom: 20px;
+    line-height: 1.4;
+    font-family: 'Arial', sans-serif;
+}
+
+.app-progress {
+    margin-bottom: 20px;
+}
+
+.progress-text {
+    font-size: 0.9em;
+    color: #888;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4ecdc4, #45b7d1);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.app-card[data-app="alphabet"] .progress-fill {
+    width: 100%;
+}
+
+.app-card[data-app="numbers"] .progress-fill,
+.app-card[data-app="shapes"] .progress-fill,
+.app-card[data-app="colors"] .progress-fill {
+    width: 0%;
+}
+
+.app-button {
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.app-button:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.app-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px solid #eee;
+    flex-shrink: 0;
+}
+
+.footer p {
+    color: #666;
+    font-size: 0.95em;
+}
+
+/* Animations */
+@keyframes rainbowText {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+        margin: 10px;
+    }
+    
+    .main-title {
+        font-size: 2.5em;
+    }
+    
+    .apps-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .app-card {
+        padding: 20px;
+    }
+    
+    .app-icon {
+        font-size: 3em;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-title {
+        font-size: 2em;
+    }
+    
+    .subtitle {
+        font-size: 1.2em;
+    }
+    
+    .app-title {
+        font-size: 1.5em;
+    }
+}

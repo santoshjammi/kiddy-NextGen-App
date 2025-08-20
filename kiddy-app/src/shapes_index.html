@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shape Explorer - Learn Basic Shapes</title>
+    <link rel="stylesheet" href="shapes_style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Header -->
+        <header class="nav-header">
+            <button class="back-button" onclick="returnToHub()">← Back to Hub</button>
+            <h1 class="app-title">🔺 Shape Explorer</h1>
+            <div class="shape-counter">
+                <span id="shapeCounter">Shape 1 of 10</span>
+            </div>
+        </header>
+
+        <!-- Progress Section -->
+        <div class="progress-section">
+            <div class="progress-info">
+                <span class="progress-text">Progress: <span id="progressCount">0/10</span></span>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="mainProgress"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Shape Display -->
+        <div class="main-display">
+            <div class="shape-showcase" id="shapeShowcase">
+                <div class="shape-container" id="shapeContainer">
+                    <!-- Animated shape will be created here -->
+                </div>
+            </div>
+            <div class="shape-name" id="shapeName">Circle</div>
+            <div class="shape-description" id="shapeDescription">A round shape with no corners</div>
+            <div class="image-display">
+                <img id="shapeImage" src="" alt="Shape example" class="hidden">
+            </div>
+        </div>
+
+        <!-- Shapes Grid -->
+        <div class="shapes-grid" id="shapesGrid">
+            <!-- Shape cards will be populated by JavaScript -->
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="controls">
+            <button class="control-btn" id="prevBtn" onclick="previousShape()">⬅️ Previous</button>
+            <button class="control-btn play-btn" id="playBtn" onclick="playShapeAudio()">🔊 Listen</button>
+            <button class="control-btn" id="nextBtn" onclick="nextShape()">Next ➡️</button>
+            <button class="control-btn" id="random-shape" onclick="randomShape()">🎲 Surprise Me!</button>
+            <button class="control-btn" id="reset-progress" onclick="resetProgress()">🔄 Start Over</button>
+        </div>
+
+        <!-- Fun Facts Section -->
+        <div class="fun-facts" id="funFacts">
+            <h3>🎯 Fun Fact:</h3>
+            <p id="funFactText">Circles are everywhere! Look for wheels, balls, and the sun!</p>
+        </div>
+    </div>
+
+    <script src="shapes_app.js"></script>
+</body>
+</html>

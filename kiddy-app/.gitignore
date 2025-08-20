@@ -1,0 +1,67 @@
+# 🔒 Security & Environment
+.env
+.env.local
+.env.production
+*.key
+api_keys.txt
+**/assets/**
+# 🐍 Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+venv/
+env/
+ENV/
+
+# 🚀 Deployment & Build
+Deployment_v2.0/
+*.zip
+*.tar.gz
+deployment/
+dist/
+
+# 🔧 Development
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# 📝 Temporary Files
+*.tmp
+*.temp
+*.log
+*.cache
+
+# 🎨 Large Assets (Optional - uncomment if you want to exclude)
+# **/assets/
+# **/numbers_assets/
+# **/shapes_assets/
+# **/colors_assets/
+
+# 🧪 Development Files
+enhanced_*
+main_*
+test_*.py
+create_*.py
+DEPLOYMENT_COMPLETE.md

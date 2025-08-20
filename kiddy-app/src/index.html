@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiddy Learning Hub - Fun Educational Games</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="main-title">🎓 Kiddy Learning Hub</h1>
+            <p class="subtitle">Choose your learning adventure!</p>
+        </header>
+
+        <div class="apps-grid">
+            <div class="app-card" data-app="alphabet">
+                <div class="app-icon">🔤</div>
+                <h2 class="app-title">ABC Letters</h2>
+                <p class="app-description">Learn the alphabet A-Z with fun images and sounds!</p>
+                <div class="app-progress">
+                    <span class="progress-text">26 Letters</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+                <button class="app-button" onclick="openApp('alphabet')">Start Learning!</button>
+            </div>
+
+            <div class="app-card" data-app="numbers">
+                <div class="app-icon">🔢</div>
+                <h2 class="app-title">Number Fun</h2>
+                <p class="app-description">Count and learn numbers 1-100 with visual examples!</p>
+                <div class="app-progress">
+                    <span class="progress-text">100 Numbers</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                <button class="app-button" onclick="openApp('numbers')">Start Counting!</button>
+            </div>
+
+            <div class="app-card" data-app="shapes">
+                <div class="app-icon">🔺</div>
+                <h2 class="app-title">Shape Explorer</h2>
+                <p class="app-description">Discover circles, squares, triangles and more!</p>
+                <div class="app-progress">
+                    <span class="progress-text">10 Shapes</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                <button class="app-button" onclick="openApp('shapes')">Start Exploring!</button>
+            </div>
+
+            <div class="app-card" data-app="colors">
+                <div class="app-icon">🎨</div>
+                <h2 class="app-title">Color World</h2>
+                <p class="app-description">Learn colors with beautiful interactive examples!</p>
+                <div class="app-progress">
+                    <span class="progress-text">12 Colors</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                <button class="app-button" onclick="openApp('colors')">Start Painting!</button>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>✨ Making learning fun for little minds! ✨</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
