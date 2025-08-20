@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color World - Learn Beautiful Colors</title>
+    <link rel="stylesheet" href="colors_style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Header -->
+        <header class="nav-header">
+            <button class="back-button" onclick="returnToHub()">← Back to Hub</button>
+            <h1 class="app-title">🎨 Color World</h1>
+            <div class="color-counter">
+                <span id="colorCounter">Color 1 of 12</span>
+            </div>
+        </header>
+
+        <!-- Progress Section -->
+        <div class="progress-section">
+            <div class="progress-info">
+                <span class="progress-text">Progress: <span id="progressCount">0/12</span></span>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="mainProgress"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Color Display -->
+        <div class="main-display">
+            <div class="color-showcase" id="colorShowcase">
+                <div class="color-circle" id="colorCircle">
+                    <!-- Animated color display -->
+                </div>
+            </div>
+            <div class="color-name" id="colorName">Red</div>
+            <div class="color-description" id="colorDescription">A warm, bright color like fire and roses</div>
+            <div class="color-examples" id="colorExamples">
+                <h4>You can find this color in:</h4>
+                <div class="examples-list" id="examplesList"></div>
+            </div>
+            <div class="image-display">
+                <img id="colorImage" src="" alt="Color example" class="hidden">
+            </div>
+        </div>
+
+        <!-- Colors Grid -->
+        <div class="colors-grid" id="colorsGrid">
+            <!-- Color cards will be populated by JavaScript -->
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="controls">
+            <button class="control-btn" id="prevBtn" onclick="previousColor()">⬅️ Previous</button>
+            <button class="control-btn play-btn" id="playBtn" onclick="playColorAudio()">🔊 Listen</button>
+            <button class="control-btn mix-btn" id="mixBtn" onclick="showColorMixing()">🎨 Mix Colors</button>
+            <button class="control-btn" id="nextBtn" onclick="nextColor()">Next ➡️</button>
+            <button class="control-btn" id="random-color" onclick="randomColor()">🎲 Surprise Me!</button>
+            <button class="control-btn" id="reset-progress" onclick="resetProgress()">🔄 Start Over</button>
+        </div>
+
+        <!-- Color Mixing Section -->
+        <div class="color-mixing hidden" id="colorMixing">
+            <h3>🎨 Color Mixing Magic!</h3>
+            <div class="mixing-area">
+                <div class="mix-color" id="mixColor1" onclick="selectMixColor(0)">
+                    <div class="mix-circle red-circle"></div>
+                    <span>Red</span>
+                </div>
+                <div class="mix-operator">+</div>
+                <div class="mix-color" id="mixColor2" onclick="selectMixColor(1)">
+                    <div class="mix-circle blue-circle"></div>
+                    <span>Blue</span>
+                </div>
+                <div class="mix-operator">=</div>
+                <div class="mix-result" id="mixResult">
+                    <div class="mix-circle purple-circle"></div>
+                    <span>Purple</span>
+                </div>
+            </div>
+            <div class="mixing-controls">
+                <button class="control-btn small" onclick="tryMixing()">✨ Mix Them!</button>
+                <button class="control-btn small" onclick="hideMixing()">❌ Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="colors_app.js"></script>
+</body>
+</html>

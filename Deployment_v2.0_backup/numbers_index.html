@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Fun - Learn Numbers 1-100</title>
+    <link rel="stylesheet" href="numbers_style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Header -->
+        <header class="nav-header">
+            <button class="back-button" onclick="returnToHub()">← Back to Hub</button>
+            <h1 class="app-title">🔢 Number Fun</h1>
+            <div class="range-selector">
+                <select id="rangeSelect" title="Select number range" onchange="changeRange()">
+                    <option value="1-10">1-10</option>
+                    <option value="11-20">11-20</option>
+                    <option value="21-30">21-30</option>
+                    <option value="31-40">31-40</option>
+                    <option value="41-50">41-50</option>
+                    <option value="51-60">51-60</option>
+                    <option value="61-70">61-70</option>
+                    <option value="71-80">71-80</option>
+                    <option value="81-90">81-90</option>
+                    <option value="91-100">91-100</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- Progress Section -->
+        <div class="progress-section">
+            <div class="progress-info">
+                <span class="progress-text">Progress: <span id="progressCount">0/100</span></span>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="mainProgress"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Number Display -->
+        <div class="main-display">
+            <div class="current-number" id="currentNumber">1</div>
+            <div class="number-word" id="numberWord">One</div>
+            <div class="visual-counter" id="visualCounter"></div>
+            <div class="image-display">
+                <img id="numberImage" src="" alt="Number visualization" class="hidden">
+            </div>
+        </div>
+
+        <!-- Numbers Grid -->
+        <div class="numbers-grid" id="numbersGrid">
+            <!-- Numbers 1-10 will be populated by JavaScript -->
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="controls">
+            <button class="control-btn" id="prevBtn" onclick="previousNumber()">⬅️ Previous</button>
+            <button class="control-btn play-btn" id="playBtn" onclick="playNumberAudio()">🔊 Listen</button>
+            <button class="control-btn" id="nextBtn" onclick="nextNumber()">Next ➡️</button>
+            <button class="control-btn" id="random-number" onclick="randomNumber()">🎲 Surprise Me!</button>
+            <button class="control-btn" id="reset-progress" onclick="resetProgress()">🔄 Start Over</button>
+        </div>
+
+        <!-- Range Navigation -->
+        <div class="range-navigation">
+            <button class="range-btn" onclick="changeRange('prev')">⬅️ Previous 10</button>
+            <span class="range-display" id="rangeDisplay">Numbers 1-10</span>
+            <button class="range-btn" onclick="changeRange('next')">Next 10 ➡️</button>
+        </div>
+    </div>
+
+    <script src="numbers_app.js"></script>
+</body>
+</html>

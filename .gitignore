@@ -4,7 +4,11 @@
 .env.production
 *.key
 api_keys.txt
-**/assets/**
+**/*assets*/
+Kindergarten/app/assets/
+Kindergarten/app/numbers_assets/
+Kindergarten/app/shapes_assets/
+Kindergarten/app/colors_assets/
 # 🐍 Python
 __pycache__/
 *.py[cod]

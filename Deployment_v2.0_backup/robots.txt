@@ -1,0 +1,28 @@
+User-agent: *
+Allow: /
+
+# Priority pages
+Allow: /index.html
+Allow: /alphabet_index.html
+Allow: /numbers_index.html
+Allow: /shapes_index.html
+Allow: /colors_index.html
+Allow: /about.html
+Allow: /privacy-policy.html
+
+# Allow all assets
+Allow: /assets/
+Allow: /numbers_assets/
+Allow: /shapes_assets/
+Allow: /colors_assets/
+
+# Block any development files (if any remain)
+Disallow: /test_*
+Disallow: /create_*
+Disallow: /generate_*
+Disallow: /*.py
+Disallow: /enhanced_*
+Disallow: /main_*
+
+# Sitemap location
+Sitemap: https://your-domain.com/sitemap.xml
