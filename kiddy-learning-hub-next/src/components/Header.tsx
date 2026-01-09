@@ -7,7 +7,7 @@ export function Header() {
   const { user, logout } = useAuth();
 
   return (
-    <header className="bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg h-16">
+    <header className="text-white shadow-lg h-16" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
       <div className="max-w-7xl mx-auto px-4 h-full">
         <div className="flex justify-between items-center h-full">
           <Link href="/" className="text-2xl font-bold hover:text-yellow-300 transition-colors">
