@@ -39,6 +39,23 @@ body {
     min-height: 100vh;
     padding: 15px;
     overflow-x: hidden;
+    /* Production hosting scroll fixes for Hostinger */
+    -webkit-scroll-behavior: smooth;
+    scroll-behavior: smooth;
+    /* Force hardware acceleration */
+    -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    transform: translateZ(0);
+    /* Prevent content jumping during scroll */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    /* Production-specific optimizations */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Force GPU layer */
+    will-change: scroll-position;
+    -webkit-perspective: 1000px;
+    perspective: 1000px;
     /* Ensure single-screen view optimization */
     max-height: 100vh;
     display: flex;

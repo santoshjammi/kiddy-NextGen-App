@@ -4,25 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Number Fun - Learn Numbers 1-100</title>
-    <link rel="stylesheet" href="numbers_style.css">
-    <link rel="preconnect" href="https://pagead2.googlesyndication.com">
-    
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7451593482486400" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="numbers_style.css?v=2.1">
 </head>
 <body>
-    <!-- Top Ad Banner -->
-    <div class="ad-container ad-top">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-7451593482486400"
-             data-ad-slot="auto"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-        <script>
-             (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-    </div>
     <div class="container">
         <!-- Navigation Header -->
         <header class="nav-header">
@@ -100,5 +84,43 @@
     </div>
 
     <script src="numbers_app.js"></script>
+    
+    <!-- Production hosting scroll optimization for Hostinger -->
+    <script>
+        (function() {
+            'use strict';
+            
+            // Force smooth scrolling on production
+            if (typeof CSS !== 'undefined' && CSS.supports && !CSS.supports('scroll-behavior', 'smooth')) {
+                document.documentElement.style.scrollBehavior = 'smooth';
+                document.body.style.scrollBehavior = 'smooth';
+            }
+            
+            // Enhanced scroll performance for production
+            let ticking = false;
+            
+            function updateScroll() {
+                document.body.style.transform = 'translateZ(0)';
+                ticking = false;
+            }
+            
+            function requestTick() {
+                if (!ticking) {
+                    requestAnimationFrame(updateScroll);
+                    ticking = true;
+                }
+            }
+            
+            window.addEventListener('scroll', requestTick, { passive: true });
+            window.addEventListener('resize', requestTick, { passive: true });
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
+                    document.body.style.transform = 'translateZ(0)';
+                    document.body.style.webkitTransform = 'translateZ(0)';
+                }, 100);
+            });
+        })();
+    </script>
 </body>
 </html>

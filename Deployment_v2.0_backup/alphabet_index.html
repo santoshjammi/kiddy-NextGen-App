@@ -4,28 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🌈 ABC Fun Land - Learn the Alphabet! 🎉</title>
-    <link rel="stylesheet" href="alphabet_style.css">
+    <link rel="stylesheet" href="alphabet_style.css?v=2.1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://pagead2.googlesyndication.com">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&display=swap" rel="stylesheet">
-    
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7451593482486400" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&display=swap" rel="stylesheet"
 </head>
 <body>
-    <!-- Top Ad Banner -->
-    <div class="ad-container ad-top">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-7451593482486400"
-             data-ad-slot="auto"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-        <script>
-             (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-    </div>
     <!-- Loading screen -->
     <div id="loading" class="loading">
         <div class="spinner"></div>
@@ -98,5 +82,43 @@
     <audio id="audio" src="" preload="auto"></audio>
     
     <script src="alphabet_app.js"></script>
+    
+    <!-- Production hosting scroll optimization for Hostinger -->
+    <script>
+        (function() {
+            'use strict';
+            
+            // Force smooth scrolling on production
+            if (typeof CSS !== 'undefined' && CSS.supports && !CSS.supports('scroll-behavior', 'smooth')) {
+                document.documentElement.style.scrollBehavior = 'smooth';
+                document.body.style.scrollBehavior = 'smooth';
+            }
+            
+            // Enhanced scroll performance for production
+            let ticking = false;
+            
+            function updateScroll() {
+                document.body.style.transform = 'translateZ(0)';
+                ticking = false;
+            }
+            
+            function requestTick() {
+                if (!ticking) {
+                    requestAnimationFrame(updateScroll);
+                    ticking = true;
+                }
+            }
+            
+            window.addEventListener('scroll', requestTick, { passive: true });
+            window.addEventListener('resize', requestTick, { passive: true });
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
+                    document.body.style.transform = 'translateZ(0)';
+                    document.body.style.webkitTransform = 'translateZ(0)';
+                }, 100);
+            });
+        })();
+    </script>
 </body>
 </html>
