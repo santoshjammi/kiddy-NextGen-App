@@ -1,6 +1,7 @@
-import NextAuth from "next-auth";
-import authOptions from "../../../../lib/authOptions";
-
-const handler = NextAuth(authOptions as any);
-
-export { handler as GET, handler as POST };
+// Authentication is handled by Firebase Auth. This NextAuth route is no longer active.
+export function GET() {
+  return new Response('Authentication is handled by Firebase', { status: 404 });
+}
+export function POST() {
+  return new Response('Authentication is handled by Firebase', { status: 404 });
+}
