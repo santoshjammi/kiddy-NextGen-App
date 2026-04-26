@@ -1,0 +1,51 @@
+{
+  "paper_metadata": {
+    "subject": "English",
+    "grade_level": "Grade 3",
+    "topic": "Pronouns",
+    "theme_context": "Desert Oasis Adventure",
+    "difficulty_level": "Beginner",
+    "total_questions": 3
+  },
+  "questions": [
+    {
+      "question_id": 1,
+      "question_type": "Multiple Choice",
+      "question_text": "In Scene 1, when you say \"I need your help, Sahara. Will you guide me through the desert?\", which pronouns are subject pronouns and which are object pronouns?",
+      "options": [
+        "\"I\" and \"you\" are subject pronouns; \"me\" is an object pronoun",
+        "\"I\" is a subject pronoun; \"your\" and \"me\" are object pronouns",
+        "\"I\" and \"me\" are subject pronouns; \"you\" is an object pronoun",
+        "\"I\" is a subject pronoun; \"you\" and \"me\" are object pronouns"
+      ],
+      "correct_answer": "A",
+      "explanation": "Excellent grammar detective work! In this sentence, \"I\" is the subject performing the action (needing help), so it's a subject pronoun. \"You\" is also a subject pronoun as it's the one being asked if they will guide. \"Me\" is the object receiving the action of needing help, making it an object pronoun."
+    },
+    {
+      "question_id": 2,
+      "question_type": "Multiple Choice",
+      "question_text": "In Scene 2, when you find the pouch with coins, you think \"These coins must belong to someone\" and later decide \"Someone lost these treasures, and I should find their owner.\" Which of the following sentences correctly uses possessive pronouns and adjectives?",
+      "options": [
+        "\"This is my pouch, and it belongs to I.\"",
+        "\"This is my pouch, and it belongs to me.\"",
+        "\"This is pouch mine, and it belongs to my.\"",
+        "\"This is pouch my, and it belongs to mine.\""
+      ],
+      "correct_answer": "B",
+      "explanation": "Awesome possessive mastery! In sentence B, \"my\" is a possessive adjective that describes the pouch, and \"me\" is an object pronoun that correctly follows the verb \"belongs to.\" Possessive adjectives (my, your, his, her, its, our, their) come before nouns, while possessive pronouns (mine, yours, his, hers, ours, theirs) stand alone without nouns."
+    },
+    {
+      "question_id": 3,
+      "question_type": "Multiple Choice",
+      "question_text": "In Scene 3, when you discover the oasis and say \"This is the oasis!\" and later notice \"That storm is coming toward us quickly,\" which demonstrative pronouns are being used correctly?",
+      "options": [
+        "\"This\" is used correctly for the oasis because it's near, and \"that\" is used correctly for the storm because it's far",
+        "\"This\" is used correctly for the oasis because it's far, and \"that\" is used correctly for the storm because it's near",
+        "\"This\" and \"that\" are both used incorrectly because they should be \"these\" and \"those\" for plural items",
+        "\"This\" and \"that\" are both used incorrectly because they should be reversed based on distance"
+      ],
+      "correct_answer": "A",
+      "explanation": "Fantastic distance detection! Demonstrative pronouns \"this\" and \"these\" are used for things that are near, while \"that\" and \"those\" are used for things that are far. In this context, the oasis is near the speaker, so \"This is the oasis!\" is correct. The storm is far away on the horizon, so \"That storm is coming toward us quickly!\" is also correct."
+    }
+  ]
+}
