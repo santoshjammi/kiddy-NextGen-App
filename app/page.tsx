@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import AuthButton from "../components/AuthButton";
 
@@ -39,53 +39,62 @@ function AppCard({ emoji, title, description, link, progress, total }: AppCardPr
 }
 
 export default function Home() {
+  const [progressData, setProgressData] = useState({
+    alphabet: 0,
+    numbers: 0,
+    shapes: 0,
+    colors: 0,
+  });
+
+  useEffect(() => {
+    const readCount = (key: string) => {
+      try {
+        const saved = localStorage.getItem(key);
+        return saved ? JSON.parse(saved).length : 0;
+      } catch { return 0; }
+    };
+    setProgressData({
+      alphabet: Math.round((readCount('kiddyHub_alphabetCompleted') / 26) * 100),
+      numbers: Math.round((readCount('kiddyHub_numbersCompleted') / 100) * 100),
+      shapes: Math.round((readCount('kiddyHub_shapesCompleted') / 9) * 100),
+      colors: Math.round((readCount('kiddyHub_colorsCompleted') / 12) * 100),
+    });
+  }, []);
+
   const apps = [
     {
       emoji: '🔤',
       title: 'ABC Letters Learning',
       description: 'Master the alphabet A-Z with interactive phonics, colorful images, and engaging sounds. Perfect for letter recognition!',
       link: '/alphabet',
-      progress: 100,
-      total: '26/26 Letters',
+      progress: progressData.alphabet,
+      total: `${Math.round(progressData.alphabet * 26 / 100)}/26 Letters`,
     },
     {
       emoji: '🔢',
       title: 'Numbers 1-100 Fun',
       description: 'Count and learn numbers 1 to 100 with visual dots, audio pronunciation, and fun number games. Build math foundation!',
       link: '/numbers',
-      progress: 0,
-      total: '0/100 Numbers',
+      progress: progressData.numbers,
+      total: `${Math.round(progressData.numbers)}/100 Numbers`,
     },
     {
       emoji: '🔺',
       title: 'Shape Explorer',
-      description: 'Discover 10 basic geometric shapes with animations, fun facts, and interactive learning. Develop visual skills!',
+      description: 'Discover 9 basic geometric shapes with animations, fun facts, and interactive learning. Develop visual skills!',
       link: '/shapes',
-      progress: 0,
-      total: '0/10 Shapes',
+      progress: progressData.shapes,
+      total: `${Math.round(progressData.shapes * 9 / 100)}/9 Shapes`,
     },
     {
       emoji: '🎨',
       title: 'Color World',
-      description: 'Learn 12 vibrant colors with mixing activities, real-world examples, and creative color games. Unleash creativity!',
+      description: 'Learn 12 vibrant colors with real-world examples and creative color games. Unleash creativity!',
       link: '/colors',
-      progress: 0,
-      total: '0/12 Colors',
+      progress: progressData.colors,
+      total: `${Math.round(progressData.colors * 12 / 100)}/12 Colors`,
     },
   ];
-
-  useEffect(() => {
-    apps.forEach((app) => {
-      const progressKey = app.link.replace('/', '') + 'Progress';
-      const storedProgress = localStorage.getItem(progressKey);
-      if (storedProgress && progressKey !== 'alphabetProgress') {
-        const progressEl = document.querySelector(`[data-link="${app.link}"] .progress-fill`);
-        if (progressEl) {
-          (progressEl as HTMLElement).style.width = storedProgress + '%';
-        }
-      }
-    });
-  }, []);
 
   return (
     <div className="min-h-screen p-4 md:p-6 lg:p-8">

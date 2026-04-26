@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
+// analytics is lazily initialized below
 import { getAuth } from "firebase/auth";
 
 // Your web app's Firebase configuration
@@ -18,7 +19,13 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+
+// Initialize Analytics only in the browser
+if (typeof window !== 'undefined') {
+  import('firebase/analytics').then(({ isSupported }) =>
+    isSupported().then((yes) => yes && getAnalytics(app))
+  );
+}
 
 // Initialize Firestore
 export const db = getFirestore(app);
