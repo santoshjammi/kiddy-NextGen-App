@@ -45,6 +45,44 @@ function AppCard({ emoji, title, description, link, progress, total }: AppCardPr
   );
 }
 
+interface NewGameCardProps {
+  emoji: string;
+  title: string;
+  description: string;
+  link: string;
+  badge: string;
+}
+
+function NewGameCard({ emoji, title, description, link, badge }: NewGameCardProps) {
+  return (
+    <Link href={link} className="block group">
+      <div
+        className="bg-white rounded-[24px] p-7 flex flex-col justify-between min-h-[220px] overflow-hidden
+                   transition-transform duration-200 group-hover:scale-[1.02]"
+        style={{ boxShadow: 'rgba(0,0,0,0.08) 0 5px 9px 0' }}
+      >
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-4xl">{emoji}</span>
+            <span className="text-[10px] font-semibold uppercase tracking-wider bg-[#f0f7ff] text-[#0070cc] px-2.5 py-1 rounded-full">
+              {badge}
+            </span>
+          </div>
+          <h2 className="text-[20px] font-light text-black leading-snug tracking-[0.1px] mb-2">
+            {title}
+          </h2>
+          <p className="text-[#6b6b6b] text-sm leading-relaxed">{description}</p>
+        </div>
+        <div className="mt-5">
+          <div className="ps-btn ps-btn-sm w-full justify-center">
+            Play Now
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 export default function Home() {
   const [progressData, setProgressData] = useState({
     alphabet: 0,
@@ -119,6 +157,79 @@ export default function Home() {
     },
   ];
 
+  const newGames = [
+    {
+      emoji: '🃏',
+      title: 'Memory Match',
+      description: 'Flip cards and find matching emoji pairs. Train your memory with this classic concentration game!',
+      link: '/memory-match',
+      badge: 'Memory',
+    },
+    {
+      emoji: '🔡',
+      title: 'Spelling Builder',
+      description: 'See a picture, click the shuffled letters in the right order to spell the word. 15 words to master!',
+      link: '/spelling',
+      badge: 'Spelling',
+    },
+    {
+      emoji: '🎵',
+      title: 'Rhyming Words',
+      description: 'Which word rhymes? Pick the correct rhyme from three choices. 15 fun rhyming pairs!',
+      link: '/rhyming',
+      badge: 'Language',
+    },
+    {
+      emoji: '🧩',
+      title: 'Pattern Recognition',
+      description: 'Complete the emoji pattern — what comes next? Develop logical thinking with 15 patterns!',
+      link: '/patterns',
+      badge: 'Logic',
+    },
+    {
+      emoji: '📖',
+      title: 'Sight Words',
+      description: 'Flash card practice for 90+ high-frequency Dolch words. Track which words you know!',
+      link: '/sight-words',
+      badge: 'Reading',
+    },
+    {
+      emoji: '🔢',
+      title: 'Counting Puzzle',
+      description: 'Count the objects on screen and tap the correct number. With streak tracking and animations!',
+      link: '/counting',
+      badge: 'Math',
+    },
+    {
+      emoji: '🦁',
+      title: 'Animal Sounds',
+      description: 'Hear the animal sound and pick the right animal. Covers 12 animals with speech audio!',
+      link: '/animals',
+      badge: 'Science',
+    },
+    {
+      emoji: '📝',
+      title: 'Simple Sentences',
+      description: 'Arrange scrambled word tiles to build correct sentences. 15 beginner sentences!',
+      link: '/sentences',
+      badge: 'Language',
+    },
+    {
+      emoji: '🕐',
+      title: 'Telling Time',
+      description: 'Read the analog clock face and pick the correct digital time from four choices!',
+      link: '/time',
+      badge: 'Math',
+    },
+    {
+      emoji: '✏️',
+      title: 'Tracing & Handwriting',
+      description: 'Trace all 26 letters A–Z on an interactive canvas with letter guides beneath your pen!',
+      link: '/tracing',
+      badge: 'Writing',
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-white">
 
@@ -144,7 +255,7 @@ export default function Home() {
             Educational Games for Kids Ages 3–6
           </h1>
           <p className="text-[#6b6b6b] text-xl font-light max-w-2xl mx-auto mb-10 leading-relaxed">
-            Interactive learning with ABC letters, numbers 1–100, shapes, colors, adaptive math, and word-building. Free for every child.
+            16 interactive learning games — alphabet, numbers, shapes, colors, math, spelling, memory, rhyming, patterns, sentences, time, tracing and more. Free for every child.
           </p>
           <a href="#games" className="ps-btn text-[1.125rem] px-10 py-4">
             Explore Games
@@ -155,12 +266,24 @@ export default function Home() {
       {/* ── Games Grid ───────────────────────────────────────── */}
       <section id="games" className="bg-[#f5f7fa] py-20">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-[35px] font-light text-black mb-12 leading-snug">
-            Choose Your Adventure
+
+          <h2 className="text-[35px] font-light text-black mb-3 leading-snug">
+            Core Learning
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+          <p className="text-[#6b6b6b] text-base mb-10">Foundational games covering letters, numbers, shapes, colors, math and vocabulary.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
             {apps.map((app, index) => (
               <AppCard key={index} {...app} />
+            ))}
+          </div>
+
+          <h2 className="text-[35px] font-light text-black mb-3 leading-snug">
+            New Games
+          </h2>
+          <p className="text-[#6b6b6b] text-base mb-10">Fresh challenges — spelling, memory, rhyming, patterns, sentences, time and more!</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
+            {newGames.map((game, index) => (
+              <NewGameCard key={index} {...game} />
             ))}
           </div>
 
@@ -170,7 +293,7 @@ export default function Home() {
               <h3 className="text-[18px] font-semibold text-black mb-3">About</h3>
               <p className="text-[#6b6b6b] text-sm leading-relaxed">
                 Educational games designed for kindergarten children ages 3–6.
-                Learn alphabet, counting, shapes, colors, math, and vocabulary — all in one place.
+                Learn alphabet, counting, shapes, colors, math, vocabulary and more — all in one place.
               </p>
             </div>
             <div>
@@ -182,6 +305,9 @@ export default function Home() {
                 <li>12 colors with real-world examples</li>
                 <li>Adaptive Math Engine — 5 levels</li>
                 <li>Word Builder — 4 levels</li>
+                <li>Memory Match, Spelling, Rhyming</li>
+                <li>Patterns, Sentences, Telling Time</li>
+                <li>Sight Words, Counting, Tracing</li>
               </ul>
             </div>
             <div>

@@ -16,12 +16,17 @@ export const useUserProgress = (game: string) => {
     }
 
     const fetchProgress = async () => {
-      const docRef = doc(db, 'users', user.uid, 'progress', game);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        setProgress(docSnap.data().progress || 0);
+      try {
+        const docRef = doc(db, 'users', user.uid, 'progress', game);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setProgress(docSnap.data().progress || 0);
+        }
+      } catch {
+        // Firestore rules not yet deployed — progress falls back to localStorage
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchProgress();
@@ -29,9 +34,12 @@ export const useUserProgress = (game: string) => {
 
   const saveProgress = async (newProgress: number) => {
     if (!user) return;
-
-    const docRef = doc(db, 'users', user.uid, 'progress', game);
-    await setDoc(docRef, { progress: newProgress }, { merge: true });
+    try {
+      const docRef = doc(db, 'users', user.uid, 'progress', game);
+      await setDoc(docRef, { progress: newProgress }, { merge: true });
+    } catch {
+      // Firestore rules not yet deployed — progress saved to localStorage only
+    }
     setProgress(newProgress);
   };
 
