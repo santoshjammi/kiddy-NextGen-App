@@ -52,7 +52,7 @@ function formatDate(iso: string): string {
 
 // ── Main component ────────────────────────────────────────────────
 export default function ParentDashboard() {
-  const { db, user, loading: authLoading } = useFirebase();
+  const { db, user, loading: authLoading, isPremium } = useFirebase();
   const [progressMap, setProgressMap] = useState<Record<string, SubjectProgress>>({});
   const [dataLoading, setDataLoading] = useState(true);
 
@@ -159,6 +159,28 @@ export default function ParentDashboard() {
       </header>
 
       <div className="max-w-5xl mx-auto px-6 py-10 flex flex-col gap-8">
+
+        {/* ── Premium gate banner (soft) ───────────────────── */}
+        {!isPremium && (
+          <div
+            className="rounded-[20px] p-5 flex flex-col md:flex-row items-center gap-4 text-white"
+            style={{ background: 'linear-gradient(135deg, #003791 0%, #0070cc 100%)' }}
+          >
+            <div className="text-4xl">⭐</div>
+            <div className="flex-1 text-center md:text-left">
+              <p className="font-semibold text-base">You&apos;re viewing a Premium Preview</p>
+              <p className="text-white/70 text-sm mt-0.5">
+                Deep analytics, weak-area detection, and structured practice recommendations are Premium features. Upgrade to unlock everything.
+              </p>
+            </div>
+            <Link
+              href="/upgrade"
+              className="flex-shrink-0 bg-white text-[#003791] font-bold px-5 py-2.5 rounded-full text-sm hover:bg-yellow-50 transition-colors whitespace-nowrap"
+            >
+              Upgrade →
+            </Link>
+          </div>
+        )}
 
         {/* ── Summary strip ───────────────────────────────── */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
