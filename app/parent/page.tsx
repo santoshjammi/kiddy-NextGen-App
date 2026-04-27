@@ -6,6 +6,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { useFirebase } from '../../components/FirebaseProvider';
 import AuthButton from '../../components/AuthButton';
 import type { SubjectProgress } from '../../components/useSubjectProgress';
+import { useRewards } from '../../components/useRewards';
 
 // ── Subject metadata ──────────────────────────────────────────────
 const SUBJECTS: {
@@ -54,6 +55,8 @@ export default function ParentDashboard() {
   const { db, user, loading: authLoading } = useFirebase();
   const [progressMap, setProgressMap] = useState<Record<string, SubjectProgress>>({});
   const [dataLoading, setDataLoading] = useState(true);
+
+  const { rewards } = useRewards();
 
   useEffect(() => {
     if (authLoading) return;
@@ -323,8 +326,59 @@ export default function ParentDashboard() {
           )}
         </div>
 
-        {/* ── Footer note ──────────────────────────────────── */}
+        {/* ── Rewards summary ─────────────────────────────── */}
+        <div
+          className="bg-white rounded-[20px] p-6"
+          style={{ boxShadow: 'rgba(0,0,0,0.06) 0 3px 8px 0' }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🏆</span>
+              <div>
+                <h2 className="text-[20px] font-semibold text-black">Rewards</h2>
+                <p className="text-[#6b6b6b] text-xs">Points, badges, and daily streak</p>
+              </div>
+            </div>
+            <Link href="/rewards" className="text-sm text-[#0070cc] hover:underline font-medium">
+              View all badges →
+            </Link>
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="text-center p-3 bg-[#f5f7fa] rounded-[12px]">
+              <div className="text-2xl font-bold text-[#0070cc]">{rewards.points.toLocaleString()}</div>
+              <div className="text-xs text-[#6b6b6b] mt-0.5">Points</div>
+            </div>
+            <div className="text-center p-3 bg-[#f5f7fa] rounded-[12px]">
+              <div className="text-2xl font-bold text-black">{rewards.badges.length}</div>
+              <div className="text-xs text-[#6b6b6b] mt-0.5">Badges</div>
+            </div>
+            <div className="text-center p-3 bg-[#f5f7fa] rounded-[12px]">
+              <div className="text-2xl font-bold text-orange-500">{rewards.streakDays}</div>
+              <div className="text-xs text-[#6b6b6b] mt-0.5">{rewards.streakDays === 1 ? 'Day' : 'Days'} Streak</div>
+            </div>
+          </div>
+          {rewards.badges.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {rewards.badges.slice(0, 6).map(b => (
+                <span key={b.id} className="text-xl" title={b.name}>{b.emoji}</span>
+              ))}
+              {rewards.badges.length > 6 && (
+                <span className="text-xs text-[#6b6b6b] self-center">+{rewards.badges.length - 6} more</span>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* ── Footer note ───────────────────────────────────────────── */}
         <div className="bg-[#0d0d0d] rounded-[16px] p-6 text-center">
+          <div className="flex justify-center gap-4 mb-4 flex-wrap">
+            <Link href="/learning-path" className="text-sm text-[#0070cc] hover:underline font-medium">
+              🗺️ View Learning Path
+            </Link>
+            <Link href="/rewards" className="text-sm text-[#0070cc] hover:underline font-medium">
+              🏆 View All Badges
+            </Link>
+          </div>
           <p className="text-white font-light text-sm mb-1">
             📅 15 minutes of daily practice makes a measurable difference
           </p>
