@@ -155,6 +155,14 @@ export default function Home() {
       progress: 0,
       total: 'Levels 1–4',
     },
+    {
+      emoji: '📊',
+      title: 'Carry & Borrow Grid',
+      description: 'Master column addition with carry and subtraction with borrow — the #1 math skill parents instantly understand. 5 progression levels!',
+      link: '/carry-borrow',
+      progress: 0,
+      total: 'Levels 1–5',
+    },
   ];
 
   const newGames = [
@@ -241,6 +249,7 @@ export default function Home() {
             <span className="text-white font-light text-lg tracking-wide">Kiddy Learning Hub</span>
           </div>
           <nav className="hidden md:flex items-center gap-8">
+            <Link href="/parent" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">Dashboard</Link>
             <Link href="/about" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">About</Link>
             <Link href="/contact" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">Contact</Link>
           </nav>
@@ -325,6 +334,22 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Parent Dashboard promo ──────────────────────────── */}
+      <section className="bg-black py-16">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div>
+            <h2 className="text-[30px] font-light text-white mb-3">Track Your Child&apos;s Progress</h2>
+            <p className="text-[#6b6b6b] text-base max-w-xl leading-relaxed">
+              Sign in to unlock the Parent Dashboard — see mastery levels, weak areas that need practice,
+              and daily recommendations. Your child improves through 15 minutes of structured daily sessions.
+            </p>
+          </div>
+          <Link href="/parent" className="ps-btn text-base px-8 py-4 whitespace-nowrap flex-shrink-0">
+            View Dashboard →
+          </Link>
+        </div>
+      </section>
+
       {/* ── Footer ───────────────────────────────────────────── */}
       <footer style={{ backgroundColor: '#003791' }} className="text-white py-12">
         <div className="max-w-7xl mx-auto px-6 text-center">
@@ -334,6 +359,7 @@ export default function Home() {
           </p>
           <div className="flex justify-center gap-8 flex-wrap text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
             <Link href="/about" className="hover:text-white transition-colors">About</Link>
+            <Link href="/parent" className="hover:text-white transition-colors">Dashboard</Link>
             <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
             <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <Link href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link>
