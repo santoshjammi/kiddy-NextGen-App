@@ -249,9 +249,10 @@ export default function Home() {
             <span className="text-white font-light text-lg tracking-wide">Kiddy Learning Hub</span>
           </div>
           <nav className="hidden md:flex items-center gap-8">
+            <Link href="/learning-path" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">Learning Path</Link>
+            <Link href="/rewards" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">Rewards</Link>
             <Link href="/parent" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">Dashboard</Link>
             <Link href="/about" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">About</Link>
-            <Link href="/contact" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">Contact</Link>
           </nav>
           <AuthButton />
         </div>
@@ -359,6 +360,8 @@ export default function Home() {
           </p>
           <div className="flex justify-center gap-8 flex-wrap text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
             <Link href="/about" className="hover:text-white transition-colors">About</Link>
+            <Link href="/learning-path" className="hover:text-white transition-colors">Learning Path</Link>
+            <Link href="/rewards" className="hover:text-white transition-colors">Rewards</Link>
             <Link href="/parent" className="hover:text-white transition-colors">Dashboard</Link>
             <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
             <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>

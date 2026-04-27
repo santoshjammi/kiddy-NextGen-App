@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import AuthButton from '../../components/AuthButton';
 import { useSubjectProgress } from '../../components/useSubjectProgress';
+import { useRewards } from '../../components/useRewards';
 
 // ── Types ─────────────────────────────────────────────────────────
 type GameLevel = 1 | 2 | 3 | 4 | 5;
@@ -103,6 +104,7 @@ function generateProblem(level: GameLevel): Problem {
 // ── Component ─────────────────────────────────────────────────────
 export default function CarryBorrowPage() {
   const { progress, recordSolve } = useSubjectProgress('carry-borrow');
+  const { recordCorrect, logSession } = useRewards();
   const level = (Math.min(5, progress.difficulty_level) as GameLevel);
 
   const [problem, setProblem]       = useState<Problem>(() => generateProblem(1));
@@ -113,6 +115,7 @@ export default function CarryBorrowPage() {
   const [showSolution, setShowSolution] = useState(false);
   const [streak, setStreak]         = useState(0);
   const [session, setSession]       = useState({ correct: 0, total: 0 });
+  const sessionStartRef = useRef(Date.now());
 
   // Reset inputs whenever the problem changes
   useEffect(() => {
@@ -129,6 +132,18 @@ export default function CarryBorrowPage() {
     setProblemKey(k => k + 1);
   }, [progress.difficulty_level]);
 
+  // Log session on unmount
+  useEffect(() => {
+    const startTime = sessionStartRef.current;
+    return () => {
+      const mins = Math.round((Date.now() - startTime) / 60000);
+      if (mins > 0) {
+        logSession({ subject: 'carry-borrow', durationMinutes: mins, completedModules: 1 });
+      }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleCheck = async () => {
     const studentAnswer = parseInt(answerInputs.join(''), 10);
     const correct = !isNaN(studentAnswer) && studentAnswer === problem.answer;
@@ -137,12 +152,16 @@ export default function CarryBorrowPage() {
     setStreak(s => correct ? s + 1 : 0);
     setSession(s => ({ correct: s.correct + (correct ? 1 : 0), total: s.total + 1 }));
 
+    const prevLevel = progress.difficulty_level;
     await recordSolve(
       correct,
       correct ? undefined : `level_${level}_${problem.op === '+' ? 'carry' : 'borrow'}`,
     );
 
     if (correct) {
+      const type = problem.op === '+' ? 'carry' : 'borrow';
+      const newLevel = progress.mastery_score + 2 >= 90 ? prevLevel + 1 : undefined;
+      recordCorrect(type, newLevel);
       setTimeout(nextProblem, 1400);
     } else {
       setShowSolution(true);
