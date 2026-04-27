@@ -17,9 +17,18 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-6 p-8">
-        <h2 className="text-[35px] font-light text-white">Not signed in</h2>
-        <p className="text-[#6b6b6b] font-light">Please sign in to view your profile.</p>
-        <Link href="/" className="ps-btn">← Back to Hub</Link>
+        <div className="bg-white rounded-[24px] p-10 max-w-md w-full text-center"
+             style={{ boxShadow: 'rgba(0,0,0,0.08) 0 5px 9px 0' }}>
+          <div className="text-5xl mb-5">📚</div>
+          <h2 className="text-[28px] font-light text-black mb-3">Save Your Progress</h2>
+          <p className="text-[#6b6b6b] text-sm leading-relaxed mb-6">
+            All games are free to play without signing in.
+            Sign in with Google to sync your progress across devices and track your learning journey.
+          </p>
+          <Link href="/" className="block ps-btn mb-3 text-center">
+            Continue Playing
+          </Link>
+        </div>
       </div>
     );
   }

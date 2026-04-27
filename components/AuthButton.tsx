@@ -24,14 +24,6 @@ export default function AuthButton() {
     }
   };
 
-  if (loading) {
-    return (
-      <button disabled className="ps-btn ps-btn-sm" style={{ opacity: 0.5 }}>
-        Loading…
-      </button>
-    );
-  }
-
   if (user) {
     return (
       <div className="flex items-center gap-3">
@@ -46,8 +38,13 @@ export default function AuthButton() {
   }
 
   return (
-    <button className="ps-btn ps-btn-sm" onClick={handleSignIn}>
-      Sign in with Google
+    <button
+      className="ps-btn ps-btn-sm"
+      onClick={handleSignIn}
+      disabled={loading}
+      title="Sign in to sync your progress across devices"
+    >
+      {loading ? '…' : 'Save Progress'}
     </button>
   );
 }
