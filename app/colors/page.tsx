@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useUserProgress } from '../../components/useUserProgress';
 
@@ -78,9 +78,10 @@ export default function ColorsPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-indigo-500">
-                <div className="text-white text-2xl animate-pulse text-center">
-                    Loading Color World... 🌈<br/><span className="text-sm opacity-75">Mixing magical colors!</span>
+            <div className="min-h-screen bg-black flex items-center justify-center">
+                <div className="text-center">
+                    <div className="w-12 h-12 border-2 border-[#0070cc] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-[#6b6b6b] text-base font-light">Loading Color World&hellip;</p>
                 </div>
             </div>
         );
@@ -90,29 +91,40 @@ export default function ColorsPage() {
     const colorInfo = colorData[currentKey];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-pink-300 via-blue-300 to-teal-300 p-4 md:p-8">
-            <div className="max-w-4xl mx-auto bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-6 md:p-10">
-                <div className="flex justify-between items-center mb-8">
-                    <Link href="/" className="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2 rounded-full transition-all">← Back to Hub</Link>
-                    <h1 className="text-3xl md:text-4xl font-fredoka text-indigo-600 text-center">🎨 Color World 🎨</h1>
-                    <div className="text-gray-500 font-semibold hidden md:block">Color {currentIndex + 1} of {colorKeys.length}</div>
+        <div className="min-h-screen bg-black">
+            {/* Nav */}
+            <header className="bg-black border-b border-[#1a1a1a] sticky top-0 z-50">
+                <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+                    <Link href="/" className="ps-btn ps-btn-sm ps-btn-ghost-dark">← Back</Link>
+                    <div className="text-center">
+                        <h1 className="text-[22px] font-light text-white tracking-[0.1px]">Color World</h1>
+                        <p className="text-[#6b6b6b] text-xs mt-0.5">Color {currentIndex + 1} of {colorKeys.length}</p>
+                    </div>
+                    <div className="text-[#0070cc] text-xs font-semibold">
+                        {completedColors.size}/{colorKeys.length}
+                    </div>
                 </div>
+            </header>
 
-                <div className="flex flex-col md:flex-row gap-10 items-center">
+            <div className="max-w-5xl mx-auto px-6 py-8">
+                <div className="bg-white rounded-[24px] p-6 md:p-10" style={{ boxShadow: 'rgba(0,0,0,0.08) 0 5px 9px 0' }}>
+
+                <div className="flex flex-col md:flex-row gap-10 items-center mb-10">
                     <div 
-                        className={`w-48 h-48 md:w-64 md:h-64 rounded-full shadow-2xl cursor-pointer transform transition-all hover:scale-105 active:scale-95 ${colorInfo.className}`}
+                        className={`w-48 h-48 md:w-60 md:h-60 rounded-full cursor-pointer transition-transform hover:scale-105 active:scale-95 ${colorInfo.className}`}
+                        style={{ boxShadow: 'rgba(0,0,0,0.16) 0 5px 9px 0' }}
                         onClick={() => playColorAudio(currentKey)}
                     />
 
                     <div className="flex-1 text-center md:text-left">
-                        <h2 className="text-5xl font-bold text-gray-800 mb-4">{colorInfo.name}</h2>
-                        <p className="text-xl text-gray-600 mb-6 leading-relaxed">{colorInfo.description}</p>
+                        <h2 className="text-[35px] font-light text-black mb-3">{colorInfo.name}</h2>
+                        <p className="text-[18px] text-[#6b6b6b] font-light mb-6 leading-relaxed">{colorInfo.description}</p>
                         
                         <div className="space-y-3">
-                            <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">Examples</p>
+                            <p className="text-xs font-semibold text-[#6b6b6b] tracking-wider">Examples</p>
                             <div className="flex flex-wrap justify-center md:justify-start gap-3">
                                 {colorInfo.examples.map((ex, i) => (
-                                    <span key={i} className="bg-gray-100 px-4 py-2 rounded-full text-gray-700 font-medium shadow-sm">
+                                    <span key={i} className="bg-[#f5f7fa] px-4 py-2 rounded-[20px] text-[#1f1f1f] text-sm font-medium">
                                         {ex}
                                     </span>
                                 ))}
@@ -121,26 +133,31 @@ export default function ColorsPage() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-12 gap-3 my-10">
+                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-12 gap-3 my-8">
                     {colorKeys.map((key, idx) => (
                         <button
                             key={key}
                             onClick={() => selectColor(idx)}
-                            className={`h-10 md:h-12 rounded-xl transition-all transform ${
+                            className={`h-10 md:h-12 rounded-[12px] transition-all transform ${colorData[key].className} ${
                                 currentIndex === idx 
-                                ? 'scale-110 ring-4 ring-indigo-300 shadow-lg' 
+                                ? 'scale-110 ring-2 ring-[#0070cc] ring-offset-2' 
                                 : completedColors.has(key)
                                 ? 'opacity-100'
                                 : 'opacity-50'
-                            } ${colorData[key].className}`}
+                            }`}
                         />
                     ))}
                 </div>
 
-                <div className="flex flex-wrap justify-center gap-4 border-t pt-8">
-                    <button onClick={() => selectColor(Math.max(0, currentIndex - 1))} disabled={currentIndex === 0} className="bg-gray-200 disabled:opacity-50 px-8 py-3 rounded-full font-bold text-gray-700">← Prev</button>
-                    <button onClick={() => selectColor(Math.min(colorKeys.length - 1, currentIndex + 1))} disabled={currentIndex === colorKeys.length - 1} className="bg-gray-200 disabled:opacity-50 px-8 py-3 rounded-full font-bold text-gray-700">Next →</button>
-                    <button onClick={resetProgress} className="text-red-400 hover:text-red-600 text-sm font-medium underline ml-4">Reset All Progress</button>
+                <div className="flex flex-wrap justify-center gap-4 border-t border-[#f3f3f3] pt-8">
+                    <button onClick={() => selectColor(Math.max(0, currentIndex - 1))} disabled={currentIndex === 0}
+                        className="ps-btn ps-btn-sm ps-btn-ghost">← Prev</button>
+                    <button onClick={() => selectColor(Math.min(colorKeys.length - 1, currentIndex + 1))} disabled={currentIndex === colorKeys.length - 1}
+                        className="ps-btn ps-btn-sm ps-btn-ghost">Next →</button>
+                    <button onClick={resetProgress}
+                        className="ps-btn ps-btn-sm ps-btn-ghost" style={{ color: '#c81b3a', borderColor: '#ffd0d0' }}>Reset</button>
+                </div>
+
                 </div>
             </div>
         </div>
