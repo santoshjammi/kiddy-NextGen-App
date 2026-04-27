@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import AuthButton from '../../components/AuthButton';
 import { useSubjectProgress } from '../../components/useSubjectProgress';
@@ -61,10 +61,14 @@ function shuffle<T>(arr: T[]): T[] {
   return [...arr].sort(() => Math.random() - 0.5);
 }
 
-function getChoices(word: string, blankIndex: number): string[] {
+function getChoices(word: string, blankIndex: number, level: number): string[] {
   const correct = word[blankIndex].toUpperCase();
+  // Level 1 = CVC words with a missing vowel: always show A E I O U
+  // This is pedagogically correct and teaches vowel recognition explicitly.
+  if (level === 1) return ['A', 'E', 'I', 'O', 'U'];
+  // Level 2+ = any letter blank: show 5 choices including the correct one
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-  const wrong = shuffle(alphabet.filter(c => c !== correct)).slice(0, 3);
+  const wrong = shuffle(alphabet.filter(c => c !== correct)).slice(0, 4);
   return shuffle([correct, ...wrong]);
 }
 
@@ -75,19 +79,20 @@ function getWordsForLevel(level: number): WordItem[] {
 
 export default function MissingLetterPage() {
   const { progress, recordSolve } = useSubjectProgress('missing-letter');
-  const { recordCorrect, logSession } = useRewards();
+  const { recordCorrect } = useRewards();
   const level = Math.min(3, progress.difficulty_level);
 
+  // Initialise queue and choices together so choices always match queue[0]
   const [queue, setQueue] = useState<WordItem[]>(() => getWordsForLevel(1));
   const [index, setIndex] = useState(0);
-  const [choices, setChoices] = useState<string[]>(() =>
-    getChoices(WORDS[0].word, WORDS[0].blankIndex)
-  );
+  const [choices, setChoices] = useState<string[]>(() => {
+    const q = getWordsForLevel(1);
+    return getChoices(q[0].word, q[0].blankIndex, 1);
+  });
   const [selected, setSelected] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
   const [session, setSession] = useState({ correct: 0, total: 0 });
   const [streak, setStreak] = useState(0);
-  const sessionStart = useRef(Date.now());
 
   const item = queue[index % queue.length];
 
@@ -95,16 +100,17 @@ export default function MissingLetterPage() {
     const nextIdx = (index + 1) % queue.length;
     // Refill when cycling
     if (nextIdx === 0) {
-      const newQueue = getWordsForLevel(Math.min(3, progress.difficulty_level));
+      const lvl = Math.min(3, progress.difficulty_level);
+      const newQueue = getWordsForLevel(lvl);
       setQueue(newQueue);
-      setChoices(getChoices(newQueue[0].word, newQueue[0].blankIndex));
+      setChoices(getChoices(newQueue[0].word, newQueue[0].blankIndex, lvl));
     } else {
-      setChoices(getChoices(queue[nextIdx].word, queue[nextIdx].blankIndex));
+      setChoices(getChoices(queue[nextIdx].word, queue[nextIdx].blankIndex, level));
     }
     setIndex(nextIdx);
     setSelected(null);
     setFeedback(null);
-  }, [index, queue, progress.difficulty_level]);
+  }, [index, queue, progress.difficulty_level, level]);
 
   const handleChoice = async (letter: string) => {
     if (feedback) return;

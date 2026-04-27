@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Each user can read and write their own document AND all their subcollections.
+    // This covers:
+    //   users/{uid}                        ← root user doc (isPremium, profile)
+    //   users/{uid}/progress/{subject}     ← useSubjectProgress
+    //   users/{uid}/rewards/current        ← useRewards (isPremium lives here too)
+    //   users/{uid}/sessions/{id}          ← session logs from useRewards.logSession
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      match /{document=**} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+}

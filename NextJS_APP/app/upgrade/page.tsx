@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import AuthButton from '../../components/AuthButton';
 
@@ -25,6 +26,7 @@ const PREMIUM_FEATURES = [
 ];
 
 export default function UpgradePage() {
+  const [waitlisted, setWaitlisted] = useState(false);
   return (
     <div className="min-h-screen bg-black">
 
@@ -109,12 +111,19 @@ export default function UpgradePage() {
               ))}
             </ul>
             <button
-              className="w-full bg-white text-[#003791] font-bold py-3 rounded-[12px] hover:bg-yellow-50 transition-colors"
-              onClick={() => alert('Premium billing is coming soon! You\'ll be notified when it launches.')}
+              className={`w-full font-bold py-3 rounded-[12px] transition-colors ${
+                waitlisted
+                  ? 'bg-green-100 text-green-700 cursor-default'
+                  : 'bg-white text-[#003791] hover:bg-yellow-50'
+              }`}
+              onClick={() => setWaitlisted(true)}
+              disabled={waitlisted}
             >
-              Join the Waitlist →
+              {waitlisted ? '✓ You\'re on the waitlist!' : 'Join the Waitlist →'}
             </button>
-            <p className="text-center text-white/50 text-xs -mt-3">Billing coming soon — be first to know</p>
+            <p className="text-center text-white/50 text-xs -mt-3">
+              {waitlisted ? 'We\'ll email you when billing goes live.' : 'Billing coming soon — be first to know'}
+            </p>
           </div>
 
         </div>
