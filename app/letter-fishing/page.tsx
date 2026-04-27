@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import AuthButton from '../../components/AuthButton';
 import { useSubjectProgress } from '../../components/useSubjectProgress';
@@ -12,47 +12,46 @@ interface LetterItem {
   word: string;     // word that starts with/contains this letter
   emoji: string;
   level: number;    // 1 = vowel sounds, 2 = consonant sounds, 3 = initial letter of word
-  position: 'initial' | 'vowel'; // where the target letter sits
 }
 
 const LETTERS: LetterItem[] = [
   // Level 1 — vowel sounds (letter + a word containing it)
-  { letter: 'A', word: 'apple', emoji: '🍎', level: 1, position: 'initial' },
-  { letter: 'E', word: 'egg', emoji: '🥚', level: 1, position: 'initial' },
-  { letter: 'I', word: 'igloo', emoji: '🏔️', level: 1, position: 'initial' },
-  { letter: 'O', word: 'octopus', emoji: '🐙', level: 1, position: 'initial' },
-  { letter: 'U', word: 'umbrella', emoji: '☂️', level: 1, position: 'initial' },
+  { letter: 'A', word: 'apple', emoji: '🍎', level: 1 },
+  { letter: 'E', word: 'egg', emoji: '🥚', level: 1 },
+  { letter: 'I', word: 'igloo', emoji: '🏔️', level: 1 },
+  { letter: 'O', word: 'octopus', emoji: '🐙', level: 1 },
+  { letter: 'U', word: 'umbrella', emoji: '☂️', level: 1 },
   // Level 2 — consonant initial sounds
-  { letter: 'B', word: 'ball', emoji: '⚽', level: 2, position: 'initial' },
-  { letter: 'C', word: 'cat', emoji: '🐱', level: 2, position: 'initial' },
-  { letter: 'D', word: 'dog', emoji: '🐶', level: 2, position: 'initial' },
-  { letter: 'F', word: 'fish', emoji: '🐟', level: 2, position: 'initial' },
-  { letter: 'G', word: 'goat', emoji: '🐐', level: 2, position: 'initial' },
-  { letter: 'H', word: 'hat', emoji: '🎩', level: 2, position: 'initial' },
-  { letter: 'J', word: 'jar', emoji: '🫙', level: 2, position: 'initial' },
-  { letter: 'K', word: 'kite', emoji: '🪁', level: 2, position: 'initial' },
-  { letter: 'L', word: 'lion', emoji: '🦁', level: 2, position: 'initial' },
-  { letter: 'M', word: 'moon', emoji: '🌙', level: 2, position: 'initial' },
-  { letter: 'N', word: 'nest', emoji: '🪺', level: 2, position: 'initial' },
-  { letter: 'P', word: 'pig', emoji: '🐷', level: 2, position: 'initial' },
-  { letter: 'R', word: 'rain', emoji: '🌧️', level: 2, position: 'initial' },
-  { letter: 'S', word: 'sun', emoji: '☀️', level: 2, position: 'initial' },
-  { letter: 'T', word: 'tree', emoji: '🌳', level: 2, position: 'initial' },
-  { letter: 'V', word: 'van', emoji: '🚐', level: 2, position: 'initial' },
-  { letter: 'W', word: 'wolf', emoji: '🐺', level: 2, position: 'initial' },
-  { letter: 'Y', word: 'yak', emoji: '🐂', level: 2, position: 'initial' },
-  { letter: 'Z', word: 'zebra', emoji: '🦓', level: 2, position: 'initial' },
+  { letter: 'B', word: 'ball', emoji: '⚽', level: 2 },
+  { letter: 'C', word: 'cat', emoji: '🐱', level: 2 },
+  { letter: 'D', word: 'dog', emoji: '🐶', level: 2 },
+  { letter: 'F', word: 'fish', emoji: '🐟', level: 2 },
+  { letter: 'G', word: 'goat', emoji: '🐐', level: 2 },
+  { letter: 'H', word: 'hat', emoji: '🎩', level: 2 },
+  { letter: 'J', word: 'jar', emoji: '🫙', level: 2 },
+  { letter: 'K', word: 'kite', emoji: '🪁', level: 2 },
+  { letter: 'L', word: 'lion', emoji: '🦁', level: 2 },
+  { letter: 'M', word: 'moon', emoji: '🌙', level: 2 },
+  { letter: 'N', word: 'nest', emoji: '🪺', level: 2 },
+  { letter: 'P', word: 'pig', emoji: '🐷', level: 2 },
+  { letter: 'R', word: 'rain', emoji: '🌧️', level: 2 },
+  { letter: 'S', word: 'sun', emoji: '☀️', level: 2 },
+  { letter: 'T', word: 'tree', emoji: '🌳', level: 2 },
+  { letter: 'V', word: 'van', emoji: '🚐', level: 2 },
+  { letter: 'W', word: 'wolf', emoji: '🐺', level: 2 },
+  { letter: 'Y', word: 'yak', emoji: '🐂', level: 2 },
+  { letter: 'Z', word: 'zebra', emoji: '🦓', level: 2 },
   // Level 3 — longer words, initial letter still
-  { letter: 'B', word: 'butterfly', emoji: '🦋', level: 3, position: 'initial' },
-  { letter: 'D', word: 'dolphin', emoji: '🐬', level: 3, position: 'initial' },
-  { letter: 'E', word: 'elephant', emoji: '🐘', level: 3, position: 'initial' },
-  { letter: 'F', word: 'flamingo', emoji: '🦩', level: 3, position: 'initial' },
-  { letter: 'G', word: 'giraffe', emoji: '🦒', level: 3, position: 'initial' },
-  { letter: 'P', word: 'penguin', emoji: '🐧', level: 3, position: 'initial' },
-  { letter: 'R', word: 'rainbow', emoji: '🌈', level: 3, position: 'initial' },
-  { letter: 'S', word: 'snowflake', emoji: '❄️', level: 3, position: 'initial' },
-  { letter: 'T', word: 'turtle', emoji: '🐢', level: 3, position: 'initial' },
-  { letter: 'V', word: 'volcano', emoji: '🌋', level: 3, position: 'initial' },
+  { letter: 'B', word: 'butterfly', emoji: '🦋', level: 3 },
+  { letter: 'D', word: 'dolphin', emoji: '🐬', level: 3 },
+  { letter: 'E', word: 'elephant', emoji: '🐘', level: 3 },
+  { letter: 'F', word: 'flamingo', emoji: '🦩', level: 3 },
+  { letter: 'G', word: 'giraffe', emoji: '🦒', level: 3 },
+  { letter: 'P', word: 'penguin', emoji: '🐧', level: 3 },
+  { letter: 'R', word: 'rainbow', emoji: '🌈', level: 3 },
+  { letter: 'S', word: 'snowflake', emoji: '❄️', level: 3 },
+  { letter: 'T', word: 'turtle', emoji: '🐢', level: 3 },
+  { letter: 'V', word: 'volcano', emoji: '🌋', level: 3 },
 ];
 
 const ALL_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');

@@ -5,6 +5,11 @@ import { User, onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../firestore';
 
+// isPremium is stored in and read from the rewards/current subcollection
+// (same path used by useRewards) so it is covered by existing Firestore rules.
+// Reading the root users/{uid} document requires a separate rule that many
+// projects omit — keeping it in the subcollection avoids permission errors.
+
 interface FirebaseContextType {
   auth: typeof auth;
   db: typeof db;
@@ -46,16 +51,21 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({ children }) 
     return () => unsubscribe();
   }, []);
 
-  // Keep isPremium in sync with users/{uid}.isPremium in Firestore
+  // Keep isPremium in sync — read from users/{uid}/rewards/current which is
+  // already covered by existing security rules (instead of the root doc).
   useEffect(() => {
     if (!user) {
       setIsPremium(false);
       return;
     }
-    const ref = doc(db, 'users', user.uid);
-    const unsub = onSnapshot(ref, (snap) => {
-      setIsPremium(snap.exists() ? (snap.data()?.isPremium === true) : false);
-    });
+    const ref = doc(db, 'users', user.uid, 'rewards', 'current');
+    const unsub = onSnapshot(
+      ref,
+      (snap) => {
+        setIsPremium(snap.exists() ? (snap.data()?.isPremium === true) : false);
+      },
+      () => setIsPremium(false), // permission-denied → safe default
+    );
     return () => unsub();
   }, [user]);
 
