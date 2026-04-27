@@ -1,5 +1,6 @@
 "use client";
 
+import Link from 'next/link';
 import { signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { useFirebase } from './FirebaseProvider';
 
@@ -23,16 +24,21 @@ export default function AuthButton() {
     }
   };
 
-  if (loading) return <button className="btn">Loading…</button>;
+  if (loading) {
+    return (
+      <button disabled className="ps-btn ps-btn-sm" style={{ opacity: 0.5 }}>
+        Loading…
+      </button>
+    );
+  }
 
   if (user) {
     return (
-      <div className="flex items-center gap-4">
-        <span className="text-sm">{user.email}</span>
-        <button
-          className="bg-red-500 text-white px-4 py-2 rounded"
-          onClick={handleSignOut}
-        >
+      <div className="flex items-center gap-3">
+        <Link href="/profile" className="text-sm text-[#cccccc] hover:text-white transition-colors hidden md:block">
+          {user.displayName ?? user.email}
+        </Link>
+        <button className="ps-btn ps-btn-sm" onClick={handleSignOut}>
           Sign out
         </button>
       </div>
@@ -40,10 +46,7 @@ export default function AuthButton() {
   }
 
   return (
-    <button
-      className="bg-blue-600 text-white px-4 py-2 rounded"
-      onClick={handleSignIn}
-    >
+    <button className="ps-btn ps-btn-sm" onClick={handleSignIn}>
       Sign in with Google
     </button>
   );

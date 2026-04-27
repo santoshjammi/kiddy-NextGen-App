@@ -41,16 +41,11 @@ export default function NumbersPage() {
         }
     }, []);
 
-    useEffect(() => {
-        const percentage = (completedNumbers.size / 100) * 100;
-        // If we are on the hub, we'd want to update the hub's progress.
-        // For now, we'll just handle it locally.
-    }, [completedNumbers]);
-
     const saveProgress = (newCompleted: Set<number>) => {
         setCompletedNumbers(newCompleted);
         localStorage.setItem('kiddyHub_numbersCompleted', JSON.stringify([...newCompleted]));
         localStorage.setItem('kiddyHub_numbersProgress', newCompleted.size.toString());
+        syncToFirebase(Math.round((newCompleted.size / 100) * 100));
     };
 
     const playNumberAudio = useCallback((num: number) => {
@@ -129,106 +124,88 @@ export default function NumbersPage() {
     }, [currentRange]);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-400 to-indigo-600 p-4 md:p-8 font-sans">
-            <div className="max-w-4xl mx-auto bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-10">
-                <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                    <Link href="/" className="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2 rounded-full transition-all">
-                        ← Back to Hub
-                    </Link>
+        <div className="min-h-screen bg-black">
+            {/* Nav */}
+            <header className="bg-black border-b border-[#1a1a1a] sticky top-0 z-50">
+                <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+                    <Link href="/" className="ps-btn ps-btn-sm ps-btn-ghost-dark">← Back</Link>
                     <div className="text-center">
-                        <h1 className="text-4xl md:text-5xl font-fredoka text-transparent bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text">
-                            🔢 Number Fun 🔢
-                        </h1>
-                        <p className="text-gray-600">Numbers {currentRange[0]}-{currentRange[1]}</p>
+                        <h1 className="text-[22px] font-light text-white tracking-[0.1px]">Numbers 1–100</h1>
+                        <p className="text-[#6b6b6b] text-xs mt-0.5">Range {currentRange[0]}–{currentRange[1]}</p>
                     </div>
-                    <div className="flex gap-2">
-                        <select 
-                            className="bg-gray-100 border-none rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400"
-                            value={`${currentRange[0]}-${currentRange[1]}`}
-                            onChange={(e) => changeRange('select', e.target.value)}
-                        >
-                            {[ [1,10], [11,20], [21,30], [31,40], [41,50], [51,60], [61,70], [71,80], [81,90], [91,100] ].map(([start, end]) => (
-                                <option key={`${start}-${end}`} value={`${start}-${end}`}>
-                                    {start}-{end}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    <select
+                        className="bg-[#1a1a1a] text-white border border-[#333] rounded-[6px] px-3 py-1.5 text-sm"
+                        value={`${currentRange[0]}-${currentRange[1]}`}
+                        onChange={(e) => changeRange('select', e.target.value)}
+                    >
+                        {[ [1,10], [11,20], [21,30], [31,40], [41,50], [51,60], [61,70], [71,80], [81,90], [91,100] ].map(([start, end]) => (
+                            <option key={`${start}-${end}`} value={`${start}-${end}`}>{start}–{end}</option>
+                        ))}
+                    </select>
                 </div>
+            </header>
+
+            <div className="max-w-5xl mx-auto px-6 py-8">
+                <div className="bg-white rounded-[24px] p-6 md:p-10" style={{ boxShadow: 'rgba(0,0,0,0.08) 0 5px 9px 0' }}>
 
                 {/* Progress Bar */}
                 <div className="mb-8">
-                    <div className="flex justify-between text-sm text-gray-500 mb-2">
-                        <span>Learning Progress</span>
-                        <span>{completedNumbers.size}/100</span>
+                    <div className="flex justify-between text-sm text-[#6b6b6b] mb-2">
+                        <span className="font-light">Progress</span>
+                        <span className="text-[#0070cc] font-semibold">{completedNumbers.size}/100</span>
                     </div>
-                    <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
-                        <div 
-                            className="h-full bg-gradient-to-r from-blue-400 to-indigo-500 transition-all duration-500"
-                            style={{ width: `${(completedNumbers.size / 100) * 100}%` }}
-                        ></div>
+                    <div className="ps-progress-track">
+                        <div className="ps-progress-fill" style={{ width: `${(completedNumbers.size / 100) * 100}%` }} />
                     </div>
                 </div>
 
                 {/* Main Display */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 items-center">
-                    <div className="text-center bg-indigo-50 rounded-3xl p-8 shadow-inner">
-                        <div className="text-8xl md:text-9xl font-fredoka text-indigo-600 mb-4">
+                    <div className="text-center bg-[#f5f7fa] rounded-[19px] p-8" style={{ boxShadow: 'inset rgba(0,0,0,0.04) 0 2px 6px 0' }}>
+                        <div className="text-8xl md:text-9xl font-light text-[#0070cc] mb-4">
                             {currentNumber}
                         </div>
-                        <div className="text-3xl font-semibold text-gray-700">
+                        <div className="text-[28px] font-light text-[#1f1f1f]">
                             {numberWords[currentNumber]}
                         </div>
                         <div className="mt-6 h-32 flex items-center justify-center">
                              <img 
                                 src={`/numbers_assets/${currentNumber}.webp`} 
                                 alt={numberWords[currentNumber]}
-                                className="max-h-full object-contain rounded-xl"
+                                className="max-h-full object-contain rounded-[12px]"
                                 onError={(e) => (e.currentTarget.style.display = 'none')}
                              />
                         </div>
                     </div>
 
                     <div className="space-y-4">
-                        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 min-h-[200px] flex flex-wrap items-center justify-center gap-2">
+                        <div className="bg-white rounded-[19px] p-4 border border-[#f3f3f3] min-h-[200px] flex flex-wrap items-center justify-center gap-2">
                             {Array.from({ length: Math.min(currentNumber, 20) }).map((_, i) => (
-                                <div key={i} className="w-4 h-4 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: `${i * 0.1}s` }}></div>
+                                <div key={i} className="w-4 h-4 bg-[#0070cc] rounded-full" style={{ opacity: 0.7 + (i / 20) * 0.3 }}></div>
                             ))}
                             {currentNumber > 20 && (
-                                <div className="text-indigo-400 font-bold text-xl">
-                                    ({Math.floor(currentNumber / 10)} tens and {currentNumber % 10} ones)
+                                <div className="text-[#0070cc] font-semibold text-lg">
+                                    ({Math.floor(currentNumber / 10)} tens &amp; {currentNumber % 10} ones)
                                 </div>
                             )}
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
-                            <button 
-                                onClick={() => changeRange('prev')}
-                                disabled={currentRange[0] === 1}
-                                className="bg-gray-200 hover:bg-gray-300 disabled:opacity-50 text-gray-700 font-semibold py-3 rounded-xl transition-all"
-                            >
-                                ← Prev
+                            <button onClick={() => changeRange('prev')} disabled={currentRange[0] === 1}
+                                className="ps-btn ps-btn-sm ps-btn-ghost">
+                                ← Prev Range
                             </button>
-                            <button 
-                                onClick={() => changeRange('next')}
-                                disabled={currentRange[1] === 100}
-                                className="bg-gray-200 hover:bg-gray-300 disabled:opacity-50 text-gray-700 font-semibold py-3 rounded-xl transition-all"
-                            >
-                                Next →
+                            <button onClick={() => changeRange('next')} disabled={currentRange[1] === 100}
+                                className="ps-btn ps-btn-sm ps-btn-ghost">
+                                Next Range →
                             </button>
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
-                            <button 
-                                onClick={selectRandomNumber}
-                                className="bg-orange-400 hover:bg-orange-500 text-white font-semibold py-3 rounded-xl shadow-md transition-all"
-                            >
-                                🎲 Surprise!
+                            <button onClick={selectRandomNumber} className="ps-btn ps-btn-sm">
+                                🎲 Surprise
                             </button>
-                            <button 
-                                onClick={() => playNumberAudio(currentNumber)}
-                                className="bg-blue-400 hover:bg-blue-500 text-white font-semibold py-3 rounded-xl shadow-md transition-all"
-                            >
+                            <button onClick={() => playNumberAudio(currentNumber)} className="ps-btn ps-btn-sm">
                                 🔊 Repeat
                             </button>
                         </div>
@@ -241,12 +218,12 @@ export default function NumbersPage() {
                         <button
                             key={num}
                             onClick={() => selectNumber(num)}
-                            className={`aspect-square rounded-xl text-lg md:text-xl font-bold transition-all ${
+                            className={`ps-tile aspect-square text-lg md:text-xl ${
                                 currentNumber === num
-                                    ? 'bg-indigo-600 text-white scale-110 shadow-lg ring-4 ring-indigo-200'
+                                    ? 'ps-tile-active'
                                     : completedNumbers.has(num)
-                                    ? 'bg-green-400 text-white'
-                                    : 'bg-gray-100 text-gray-600 hover:bg-indigo-100'
+                                    ? 'ps-tile-done'
+                                    : ''
                             }`}
                         >
                             {num}
@@ -255,12 +232,12 @@ export default function NumbersPage() {
                 </div>
 
                 <div className="flex justify-center">
-                    <button 
-                        onClick={resetProgress}
-                        className="text-red-400 hover:text-red-600 text-sm font-medium underline transition-colors"
-                    >
+                    <button onClick={resetProgress}
+                        className="ps-btn ps-btn-sm ps-btn-ghost" style={{ color: '#c81b3a', borderColor: '#ffd0d0' }}>
                         Reset All Progress
                     </button>
+                </div>
+
                 </div>
             </div>
         </div>

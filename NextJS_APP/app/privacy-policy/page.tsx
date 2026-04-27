@@ -4,19 +4,20 @@ import Link from 'next/link';
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 p-4 md:p-8">
-      <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden">
-        {/* Header */}
-        <header className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white p-8 md:p-12 text-center">
-          <h1 className="text-4xl md:text-5xl font-fredoka mb-4">🔒 Privacy Policy</h1>
-          <nav className="text-indigo-100 flex justify-center items-center gap-2">
-            <Link href="/" className="hover:text-white transition-colors">🏠 Home</Link>
-            <span className="opacity-50">→</span>
-            <span className="font-semibold">Privacy Policy</span>
-          </nav>
-        </header>
+    <div className="min-h-screen bg-white">
+      {/* Nav */}
+      <header className="bg-black sticky top-0 z-50">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="ps-btn ps-btn-sm ps-btn-ghost-dark">← Home</Link>
+          <span className="text-white font-light text-lg">Privacy Policy</span>
+          <div className="w-24" />
+        </div>
+      </header>
 
-        <div className="p-6 md:p-12 space-y-12">
+      <div className="max-w-5xl mx-auto px-6 py-16">
+        <h1 className="text-[54px] font-light text-black leading-tight tracking-[-0.1px] mb-6">
+          Privacy Policy
+        </h1>
           {/* Last Updated Info */}
           <div className="bg-indigo-50 rounded-2xl p-6 text-sm text-indigo-800 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -67,7 +68,7 @@ export default function PrivacyPolicyPage() {
                 </ul>
               </div>
               <div>
-                <h3 className="font-bold text-red-800 mb-4">What we don't do:</h3>
+                <h3 className="font-bold text-red-800 mb-4">What we don&apos;t do:</h3>
                 <ul className="space-y-3 text-gray-700">
                   <li className="flex items-center gap-2">❌ Collect names, addresses, or contact information</li>
                   <li className="flex items-center gap-2">❌ Ask children for personal information to play</li>
@@ -125,7 +126,6 @@ export default function PrivacyPolicyPage() {
               Email Us Directly
             </a>
           </section>
-        </div>
 
         {/* Footer */}
         <footer className="bg-gray-50 p-8 text-center border-t">

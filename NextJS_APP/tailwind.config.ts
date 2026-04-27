@@ -8,7 +8,17 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
+        'ps-blue':   '#0070cc',
+        'ps-cyan':   '#1eaedb',
+        'ice-mist':  '#f5f7fa',
+        'charcoal':  '#1f1f1f',
+        'body-gray': '#6b6b6b',
+        'ps-footer': '#003791',
+        'muted':     '#cccccc',
+      },
       fontFamily: {
+        'display': ['Inter', 'Arial', 'Helvetica', 'sans-serif'],
         'fredoka': ['"Fredoka One"', '"Comic Sans MS"', 'cursive', 'sans-serif'],
         'poppins': ['"Poppins"', '"Arial"', 'sans-serif'],
       },
