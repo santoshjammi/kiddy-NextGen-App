@@ -45,7 +45,7 @@ function useMultiProgress() {
 }
 
 export default function LearningPathPage() {
-  const { user, loading: authLoading } = useFirebase();
+  const { user, loading: authLoading, isPremium } = useFirebase();
   const multiProgress = useMultiProgress();
   const { rewards } = useRewards();
 
@@ -99,6 +99,28 @@ export default function LearningPathPage() {
       </header>
 
       <div className="max-w-3xl mx-auto px-6 py-10 flex flex-col gap-6">
+
+        {/* ── Premium gate banner (soft) ───────────────── */}
+        {!isPremium && (
+          <div
+            className="rounded-[20px] p-5 flex flex-col md:flex-row items-center gap-4 text-white"
+            style={{ background: 'linear-gradient(135deg, #003791 0%, #0070cc 100%)' }}
+          >
+            <div className="text-4xl">⭐</div>
+            <div className="flex-1 text-center md:text-left">
+              <p className="font-semibold text-base">Premium Feature Preview</p>
+              <p className="text-white/70 text-sm mt-0.5">
+                The full Structured Learning Path — adaptive difficulty, parent analytics, and reward tracking — is a Premium feature. You&apos;re seeing a preview.
+              </p>
+            </div>
+            <Link
+              href="/upgrade"
+              className="flex-shrink-0 bg-white text-[#003791] font-bold px-5 py-2.5 rounded-full text-sm hover:bg-yellow-50 transition-colors whitespace-nowrap"
+            >
+              Upgrade →
+            </Link>
+          </div>
+        )}
 
         {/* ── Overall progress bar ─────────────────────────── */}
         <div className="bg-white rounded-[20px] p-6" style={{ boxShadow: 'rgba(0,0,0,0.06) 0 3px 8px 0' }}>

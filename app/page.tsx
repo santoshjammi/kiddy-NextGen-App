@@ -236,6 +236,20 @@ export default function Home() {
       link: '/tracing',
       badge: 'Writing',
     },
+    {
+      emoji: '🔠',
+      title: 'Missing Letter',
+      description: 'Look at the picture — C _ T. Pick the missing letter to complete the word! 3 difficulty levels.',
+      link: '/missing-letter',
+      badge: 'Phonics',
+    },
+    {
+      emoji: '🎣',
+      title: 'Letter Fishing',
+      description: 'Hear the letter sound, then tap the right letter from the grid. Trains phonics through audio!',
+      link: '/letter-fishing',
+      badge: 'Phonics',
+    },
   ];
 
   return (
@@ -252,6 +266,7 @@ export default function Home() {
             <Link href="/learning-path" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">Learning Path</Link>
             <Link href="/rewards" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">Rewards</Link>
             <Link href="/parent" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">Dashboard</Link>
+            <Link href="/upgrade" className="text-[#0070cc] text-sm font-semibold hover:text-[#1883fd] transition-colors">⭐ Upgrade</Link>
             <Link href="/about" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">About</Link>
           </nav>
           <AuthButton />

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../firestore';
 
 interface FirebaseContextType {
@@ -9,6 +10,7 @@ interface FirebaseContextType {
   db: typeof db;
   user: User | null;
   loading: boolean;
+  isPremium: boolean;
 }
 
 const FirebaseContext = createContext<FirebaseContextType>({
@@ -16,6 +18,7 @@ const FirebaseContext = createContext<FirebaseContextType>({
   db,
   user: null,
   loading: true,
+  isPremium: false,
 });
 
 export const useFirebase = () => {
@@ -33,6 +36,7 @@ interface FirebaseProviderProps {
 export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -42,8 +46,21 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({ children }) 
     return () => unsubscribe();
   }, []);
 
+  // Keep isPremium in sync with users/{uid}.isPremium in Firestore
+  useEffect(() => {
+    if (!user) {
+      setIsPremium(false);
+      return;
+    }
+    const ref = doc(db, 'users', user.uid);
+    const unsub = onSnapshot(ref, (snap) => {
+      setIsPremium(snap.exists() ? (snap.data()?.isPremium === true) : false);
+    });
+    return () => unsub();
+  }, [user]);
+
   return (
-    <FirebaseContext.Provider value={{ auth, db, user, loading }}>
+    <FirebaseContext.Provider value={{ auth, db, user, loading, isPremium }}>
       {children}
     </FirebaseContext.Provider>
   );
