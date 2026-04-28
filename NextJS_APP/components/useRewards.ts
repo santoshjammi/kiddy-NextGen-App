@@ -214,6 +214,29 @@ export function useRewards() {
     } catch { /* silent — Firestore rules */ }
   }, [user, db, save, awardBadge]);
 
+  // Start a 7-day free trial — one per account, guarded by trialStartedAt presence
+  const startTrial = useCallback(async (): Promise<{ success: boolean; error?: string }> => {
+    if (!user) return { success: false, error: 'not_signed_in' };
+    try {
+      const ref = doc(db, 'users', user.uid, 'rewards', 'current');
+      const snap = await getDoc(ref);
+      if (snap.exists() && snap.data()?.trialStartedAt) {
+        return { success: false, error: 'trial_already_used' };
+      }
+      const trialStart = new Date();
+      const trialEnd = new Date(trialStart);
+      trialEnd.setDate(trialEnd.getDate() + 7);
+      await setDoc(ref, {
+        trialStartedAt: trialStart.toISOString(),
+        trialEndsAt: trialEnd.toISOString(),
+        subscriptionStatus: 'trial',
+      }, { merge: true });
+      return { success: true };
+    } catch {
+      return { success: false, error: 'write_failed' };
+    }
+  }, [user, db]);
+
   return {
     rewards,
     loading,
@@ -221,6 +244,7 @@ export function useRewards() {
     awardBadge,
     recordCorrect,
     logSession,
+    startTrial,
     sessionCarryCorrect,
     sessionBorrowCorrect,
   };
