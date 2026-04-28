@@ -291,13 +291,13 @@ export default function Home() {
       <section className="bg-black py-24 md:py-32">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <h1 className="text-[40px] md:text-[54px] font-light text-white leading-tight tracking-[-0.1px] mb-6">
-            Educational Games for Kids Ages 3–6
+            Give your child a head start —<br className="hidden md:block" /> before school begins
           </h1>
           <p className="text-[#6b6b6b] text-xl font-light max-w-2xl mx-auto mb-10 leading-relaxed">
-            16 interactive learning games — alphabet, numbers, shapes, colors, math, spelling, memory, rhyming, patterns, sentences, time, tracing and more. Free for every child.
+            Structured learning in math, reading and writing for children aged 3–6. Built around what kids need before school — and how they actually learn it. Free for every child.
           </p>
           <a href="#games" className="ps-btn text-[1.125rem] px-10 py-4">
-            Explore Games
+            Start Learning Free →
           </a>
         </div>
       </section>
