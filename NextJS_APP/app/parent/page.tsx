@@ -224,10 +224,10 @@ export default function ParentDashboard() {
         {/* ── Summary strip ───────────────────────────────── */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
           {[
-            { label: 'Problems Solved', value: totalProblems.toLocaleString(), icon: '✅' },
-            { label: 'Today (min)', value: sessionStats.todayMinutes.toString(), icon: '⏱️' },
-            { label: 'Days This Week', value: `${sessionStats.weekDays}/7`, icon: '📅' },
-            { label: 'Weekly Minutes', value: sessionStats.weekMinutes.toString(), icon: '🕐' },
+            { label: 'Questions Answered', value: totalProblems.toLocaleString(), icon: '✅' },
+            { label: "Today's Practice", value: `${sessionStats.todayMinutes} min`, icon: '⏱️' },
+            { label: 'Days Active', value: `${sessionStats.weekDays}/7`, icon: '📅' },
+            { label: 'Week’s Practice', value: `${sessionStats.weekMinutes} min`, icon: '🕐' },
             { label: 'Streak', value: rewards.streakDays.toString(), icon: '🔥' },
           ].map(stat => (
             <div
@@ -249,7 +249,7 @@ export default function ParentDashboard() {
         >
           <div className="flex items-center gap-2 mb-4">
             <span className="text-2xl">📖</span>
-            <h2 className="text-[20px] font-semibold text-black">This Week</h2>
+            <h2 className="text-[20px] font-semibold text-black">This Week&apos;s Story</h2>
           </div>
           <div className="flex flex-col gap-2.5">
             <p className="text-[#333] text-sm leading-relaxed">
@@ -281,7 +281,7 @@ export default function ParentDashboard() {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-2xl">{uniqueStruggles.length > 0 ? adaptiveEmoji : '🎯'}</span>
-                <h2 className="text-[22px] font-semibold">Recommended Today</h2>
+                <h2 className="text-[22px] font-semibold">What to Practise Today</h2>
               </div>
               <p className="text-white/80 text-sm leading-relaxed">{recommendation}</p>
             </div>
@@ -296,7 +296,7 @@ export default function ParentDashboard() {
             <div className="absolute inset-0 flex flex-col items-center justify-center rounded-[20px] bg-[#003791]/80">
               <span className="text-3xl mb-2">⭐</span>
               <p className="font-semibold text-white text-sm mb-1">Premium Feature</p>
-              <p className="text-white/70 text-xs mb-4 text-center px-6">Personalised daily recommendations — upgrade to unlock</p>
+              <p className="text-white/70 text-xs mb-4 text-center px-6">See exactly what your child should practise today — upgrade to unlock</p>
               <Link href="/upgrade" className="bg-white text-[#003791] font-bold px-5 py-2 rounded-full text-sm hover:bg-yellow-50 transition-colors">
                 Upgrade →
               </Link>
@@ -306,7 +306,7 @@ export default function ParentDashboard() {
 
         {/* ── Subject progress cards ───────────────────────── */}
         <div>
-          <h2 className="text-[24px] font-light text-black mb-5">Subject Progress</h2>
+          <h2 className="text-[24px] font-light text-black mb-5">Learning Progress</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {SUBJECTS.map(({ key, label, emoji, route, color }) => {
               const p = progressMap[key] ?? defaultProgress(key);
@@ -370,8 +370,8 @@ export default function ParentDashboard() {
             <div className="flex items-center gap-2 mb-4">
               <span className="text-2xl">⚠️</span>
               <div>
-                <h2 className="text-[20px] font-semibold text-black">Needs Practice</h2>
-                <p className="text-[#6b6b6b] text-xs">Areas where your child made mistakes recently</p>
+                <h2 className="text-[20px] font-semibold text-black">Where to Focus</h2>
+                <p className="text-[#6b6b6b] text-xs">Concepts your child got wrong — ranked by frequency</p>
               </div>
             </div>
 
@@ -409,9 +409,9 @@ export default function ParentDashboard() {
           {!isPremium && (
             <div className="absolute inset-0 flex flex-col items-center justify-center rounded-[20px] bg-white/90">
               <span className="text-4xl mb-2">🔍</span>
-              <p className="font-semibold text-black text-sm mb-1">Weak Area Analysis</p>
+              <p className="font-semibold text-black text-sm mb-1">Pinpoint What&apos;s Holding Them Back</p>
               <p className="text-[#6b6b6b] text-xs mb-4 text-center px-6 max-w-xs">
-                See exactly where your child struggles — upgrade to unlock detailed weak area tracking
+                Identify the exact concepts your child keeps getting wrong — and get a daily plan to fix them
               </p>
               <Link href="/upgrade" className="bg-[#0070cc] text-white font-bold px-5 py-2 rounded-full text-sm hover:bg-[#0060bb] transition-colors">
                 Unlock Analysis →
@@ -452,9 +452,9 @@ export default function ParentDashboard() {
           {!isPremium && (
             <div className="absolute inset-0 flex flex-col items-center justify-center rounded-[20px] bg-[#001a4d]/85">
               <span className="text-4xl mb-2">📋</span>
-              <p className="font-semibold text-white text-sm mb-1">Daily Learning Plan</p>
+              <p className="font-semibold text-white text-sm mb-1">Your Child&apos;s Daily Study Plan</p>
               <p className="text-white/70 text-xs mb-4 text-center px-6 max-w-xs">
-                Get a personalised 20-minute daily plan — feels like having a private tutor
+                A structured 20-minute daily plan built from your child&apos;s actual gaps — no guesswork
               </p>
               <Link href="/upgrade" className="bg-white text-[#003791] font-bold px-5 py-2 rounded-full text-sm hover:bg-yellow-50 transition-colors">
                 Unlock Plan →
@@ -471,8 +471,8 @@ export default function ParentDashboard() {
           <div className="flex items-center gap-2 mb-4">
             <span className="text-2xl">✅</span>
             <div>
-              <h2 className="text-[20px] font-semibold text-black">Strengths</h2>
-              <p className="text-[#6b6b6b] text-xs">Subjects with 70%+ mastery</p>
+              <h2 className="text-[20px] font-semibold text-black">What They&apos;ve Mastered</h2>
+              <p className="text-[#6b6b6b] text-xs">Subjects with 70%+ mastery — celebrate these wins</p>
             </div>
           </div>
 

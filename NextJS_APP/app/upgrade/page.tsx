@@ -18,17 +18,17 @@ const OUTCOME_TRACKS = [
   {
     icon: '🏆',
     title: '7-Day Math Confidence Challenge',
-    body: 'Your child goes from dreading sums to solving carry-overs with ease. Structured daily practice, adaptive difficulty.',
+    body: 'Your child stops avoiding math and starts asking for more problems. Carry-overs, borrowing and place value — built right from the first attempt.',
   },
   {
     icon: '📖',
     title: 'Spelling Champion Program',
-    body: 'From missing letters to building real words. Phonics, vowels, and vocabulary — all in 10 minutes a day.',
+    body: 'In 14 days, your child moves from guessing letters to spelling words independently. Daily phonics practice that actually sticks.',
   },
   {
     icon: '🏎️',
     title: 'Multiplication Master Track',
-    body: 'Times tables mastered in 3 weeks. Race-style games that make memorization feel like winning.',
+    body: 'Times tables cracked in 3 weeks — no flashcards, no tears. The race-style format makes your child beg to practise.',
   },
 ];
 
@@ -162,12 +162,12 @@ export default function UpgradePage() {
         <div className="max-w-2xl mx-auto flex flex-col gap-6">
           <div className="text-[64px]">🚀</div>
           <h2 className="text-[36px] md:text-[48px] font-bold text-white leading-tight">
-            Real improvement<br />
-            in <span style={{ color: '#0070cc' }}>15 minutes a day</span>
+            Know your child&apos;s gaps.<br />
+            Close them in <span style={{ color: '#0070cc' }}>15 minutes a day</span>.
           </h2>
           <p className="text-[#6b6b6b] text-lg leading-relaxed max-w-xl mx-auto">
-            Kiddy Premium turns screen time into measurable learning.
-            Parents see the difference in weeks — not months.
+            Premium shows you exactly where your child is struggling — then builds a daily plan to fix it.
+            Most parents see measurable progress within 2 weeks.
           </p>
 
           {/* Primary CTA */}
@@ -249,7 +249,7 @@ export default function UpgradePage() {
       {/* ── Outcome tracks ──────────────────────────────────── */}
       <section className="py-16 px-6 border-b border-[#1a1a1a]">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-white text-2xl font-bold text-center mb-10">Outcomes, not subscriptions</h2>
+          <h2 className="text-white text-2xl font-bold text-center mb-10">What your child will achieve</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {OUTCOME_TRACKS.map(({ icon, title, body }) => (
               <div
@@ -268,7 +268,7 @@ export default function UpgradePage() {
       {/* ── Plans comparison ─────────────────────────────────── */}
       <section className="py-16 px-6 border-b border-[#1a1a1a]">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-white text-2xl font-bold text-center mb-10">Free vs Premium</h2>
+          <h2 className="text-white text-2xl font-bold text-center mb-10">What changes when you upgrade</h2>
           <div className="bg-[#0d0d0d] border border-[#1a1a1a] rounded-[20px] overflow-hidden">
             <div className="grid grid-cols-3 gap-0 border-b border-[#1a1a1a] bg-black px-6 py-4">
               <span className="text-[#6b6b6b] text-sm font-semibold">Feature</span>
