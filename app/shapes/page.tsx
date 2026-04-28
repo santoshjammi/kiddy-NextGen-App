@@ -177,13 +177,16 @@ export default function ShapesPage() {
                             onClick={() => playShapeAudio(currentShapeKey)}
                             style={{ 
                                 clipPath: 
-                                    currentShapeKey === 'circle' ? 'circle(50%)' :
-                                    currentShapeKey === 'square' ? 'inset(0)' :
-                                    currentShapeKey === 'triangle' ? 'polygon(50% 0%, 0% 100%, 100% 100%)' :
-                                    currentShapeKey === 'rectangle' ? 'inset(0 20% 0 20%)' :
-                                    currentShapeKey === 'diamond' ? 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' :
-                                    currentShapeKey === 'star' ? 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' :
-                                    currentShapeKey === 'heart' ? 'polygon(50% 15%, 80% 0%, 100% 30%, 50% 100%, 0% 30%, 20% 0%)' : 'none'
+                                    currentShapeKey === 'circle'    ? 'circle(50%)' :
+                                    currentShapeKey === 'square'    ? 'inset(0)' :
+                                    currentShapeKey === 'triangle'  ? 'polygon(50% 0%, 0% 100%, 100% 100%)' :
+                                    currentShapeKey === 'rectangle' ? 'inset(0 8% 20% 8%)' :
+                                    currentShapeKey === 'oval'      ? 'ellipse(50% 32% at 50% 50%)' :
+                                    currentShapeKey === 'diamond'   ? 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' :
+                                    currentShapeKey === 'star'      ? 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' :
+                                    currentShapeKey === 'heart'     ? 'polygon(50% 15%, 80% 0%, 100% 30%, 50% 100%, 0% 30%, 20% 0%)' :
+                                    currentShapeKey === 'hexagon'   ? 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)' :
+                                    'none'
                             }}
                         >
                             {/* Tailwind can't easily do all clip-paths for custom shapes without complex config, 
