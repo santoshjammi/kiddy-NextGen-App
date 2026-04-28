@@ -51,6 +51,27 @@ const LEVEL4_WORDS = [
   'storm', 'tiger', 'water', 'lunch', 'grape',
 ];
 
+// Level 5 — Sentence Fill-in-the-Blank
+interface SentenceItem {
+  emoji: string;
+  template: string;   // Sentence with ___ for the blank
+  answer: string;     // Correct word
+  choices: string[];  // 4 choices including the answer
+}
+
+const LEVEL5_SENTENCES: SentenceItem[] = [
+  { emoji: '🐱', template: 'The ___ sat on the mat.',   answer: 'cat',   choices: ['cat', 'bat', 'hat', 'rat'] },
+  { emoji: '☀️', template: 'The ___ shines in the sky.', answer: 'sun',   choices: ['sun', 'fun', 'run', 'bun'] },
+  { emoji: '🌧️', template: 'I play in the ___.',         answer: 'rain',  choices: ['rain', 'pain', 'main', 'gain'] },
+  { emoji: '🐶', template: 'The ___ wags its tail.',     answer: 'dog',   choices: ['dog', 'fog', 'hog', 'log'] },
+  { emoji: '🎒', template: 'She puts books in her ___.',  answer: 'bag',   choices: ['bag', 'tag', 'rag', 'flag'] },
+  { emoji: '🌊', template: 'We swim in the ___.',         answer: 'sea',   choices: ['sea', 'tea', 'pea', 'flea'] },
+  { emoji: '🍎', template: 'I ate a red ___.',            answer: 'apple', choices: ['apple', 'table', 'cable', 'fable'] },
+  { emoji: '🚂', template: 'The ___ goes on the track.',  answer: 'train', choices: ['train', 'brain', 'grain', 'plain'] },
+  { emoji: '🌙', template: 'Stars shine at ___.',         answer: 'night', choices: ['night', 'light', 'right', 'sight'] },
+  { emoji: '🐦', template: 'The ___ sings in the tree.',  answer: 'bird',  choices: ['bird', 'word', 'herd', 'lord'] },
+];
+
 // ─── Level 1: Letter Blocks ───────────────────────────────────────────────────
 
 type L1Data = { word: string; emoji: string; hint: string };
@@ -399,6 +420,79 @@ function WordleGame({ word, onCorrect, onWrong }: { word: string; onCorrect: () 
   );
 }
 
+// ─── Level 5: Sentence Fill-in-the-Blank ─────────────────────────────────────
+
+function SentenceChoose({ data, onCorrect, onWrong }: { data: SentenceItem; onCorrect: () => void; onWrong: () => void }) {
+  const [selected, setSelected] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
+  const [shuffledChoices] = useState<string[]>(() => [...data.choices].sort(() => Math.random() - 0.5));
+
+  const parts = data.template.split('___');
+
+  const handleChoice = (choice: string) => {
+    if (feedback) return;
+    setSelected(choice);
+    if (choice === data.answer) {
+      setFeedback('correct');
+      setTimeout(onCorrect, 1000);
+    } else {
+      setFeedback('wrong');
+      setTimeout(() => { setSelected(null); setFeedback(null); }, 1100);
+      onWrong();
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-7 w-full max-w-sm">
+      <div className="text-7xl">{data.emoji}</div>
+
+      {/* Sentence with blank filled in when selected */}
+      <div className="text-center text-2xl font-semibold text-gray-700 leading-relaxed">
+        {parts[0]}
+        <span
+          className={`inline-block min-w-[4rem] px-2 pb-0.5 border-b-4 mx-1 transition-colors ${
+            feedback === 'correct'
+              ? 'border-green-500 text-green-600'
+              : feedback === 'wrong'
+              ? 'border-red-500 text-red-600'
+              : selected
+              ? 'border-blue-400 text-blue-700'
+              : 'border-gray-400 text-gray-400'
+          }`}
+        >
+          {selected ?? '___'}
+        </span>
+        {parts[1]}
+      </div>
+
+      {feedback === 'correct' && <p className="text-xl font-bold text-green-500">🌟 Correct!</p>}
+      {feedback === 'wrong' && <p className="text-lg font-bold text-red-500">Try again!</p>}
+
+      {/* Word choices */}
+      <div className="grid grid-cols-2 gap-3 w-full">
+        {shuffledChoices.map(choice => {
+          const isSelected = selected === choice;
+          let cls = 'py-3 text-lg font-bold rounded-xl border-2 transition-all ';
+          if (feedback && isSelected) {
+            cls += feedback === 'correct'
+              ? 'bg-green-400 border-green-500 text-white scale-105'
+              : 'bg-red-400 border-red-500 text-white';
+          } else if (feedback && choice === data.answer) {
+            cls += 'bg-green-100 border-green-400 text-green-700';
+          } else {
+            cls += 'bg-orange-50 border-orange-300 text-orange-800 hover:bg-orange-100 hover:scale-105 cursor-pointer';
+          }
+          return (
+            <button key={choice} className={cls} onClick={() => handleChoice(choice)} disabled={!!feedback}>
+              {choice}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ─── Main EnglishEngine ───────────────────────────────────────────────────────
 
 const LEVEL_LABELS: Record<number, string> = {
@@ -406,6 +500,7 @@ const LEVEL_LABELS: Record<number, string> = {
   2: '3-Letter CVC',
   3: '4-Letter Scramble',
   4: '5-Letter Wordle',
+  5: 'Sentence Builder',
 };
 
 export default function EnglishEngine() {
@@ -486,6 +581,14 @@ export default function EnglishEngine() {
           <WordleGame
             key={key}
             word={LEVEL4_WORDS[wordIndex % LEVEL4_WORDS.length]}
+            onCorrect={() => handleResult(true)}
+            onWrong={() => handleResult(false)}
+          />
+        )}
+        {level >= 5 && (
+          <SentenceChoose
+            key={key}
+            data={LEVEL5_SENTENCES[wordIndex % LEVEL5_SENTENCES.length]}
             onCorrect={() => handleResult(true)}
             onWrong={() => handleResult(false)}
           />

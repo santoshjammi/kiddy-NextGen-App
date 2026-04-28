@@ -246,9 +246,23 @@ export default function Home() {
     {
       emoji: '🎣',
       title: 'Letter Fishing',
-      description: 'Hear the letter sound, then tap the right letter from the grid. Trains phonics through audio!',
+      description: 'Hear the letter sound, then drag the matching tile to the hook. Trains phonics through audio!',
       link: '/letter-fishing',
       badge: 'Phonics',
+    },
+    {
+      emoji: '🏎️',
+      title: 'Multiplication Race',
+      description: 'Beat the clock! Answer ×tables as fast as you can. 5 difficulty levels up to ×12.',
+      link: '/multiplication-race',
+      badge: 'Math',
+    },
+    {
+      emoji: '➗',
+      title: 'Division Splitter',
+      description: 'Share items equally into groups. Visual group reveal — from ÷2 up to ÷12.',
+      link: '/division-splitter',
+      badge: 'Math',
     },
   ];
 

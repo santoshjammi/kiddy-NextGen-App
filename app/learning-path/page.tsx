@@ -19,18 +19,20 @@ interface PathStep {
 }
 
 const PATH: PathStep[] = [
-  { id: 's1', emoji: '1️⃣',  label: '1-Digit Math',       description: 'Counting, addition + subtraction with visual blocks', route: '/math',         subject: 'mathematics', unlockLevel: 1 },
-  { id: 's2', emoji: '📝',  label: 'ABC & Letters',       description: 'Alphabet recognition, phonics, letter sounds',        route: '/alphabet',     subject: 'alphabet',    unlockLevel: 1 },
-  { id: 's3', emoji: '🎨',  label: 'Colors & Shapes',     description: '12 colors and 9 geometric shapes with fun facts',     route: '/colors',       subject: 'colors',      unlockLevel: 1 },
-  { id: 's4', emoji: '📦',  label: 'Carry & Borrow',      description: 'Column addition with carry — the core math skill',    route: '/carry-borrow', subject: 'carry-borrow',unlockLevel: 1 },
-  { id: 's5', emoji: '🔤',  label: '2–3 Letter Words',    description: 'Sight words, missing letters, basic spelling',        route: '/english',      subject: 'english',     unlockLevel: 1 },
-  { id: 's6', emoji: '🧩',  label: 'Patterns & Logic',    description: 'Complete emoji sequences — develop logical thinking', route: '/patterns',     subject: 'patterns',    unlockLevel: 1 },
-  { id: 's7', emoji: '🔢',  label: '2-Digit Math',        description: 'Addition + subtraction up to 99 with column layout',  route: '/math',         subject: 'mathematics', unlockLevel: 2 },
-  { id: 's8', emoji: '🔡',  label: '4–5 Letter Spelling', description: 'Spell Builder — arrange letters to form words',       route: '/spelling',     subject: 'spelling',    unlockLevel: 1 },
-  { id: 's9', emoji: '🕐',  label: 'Telling Time',        description: 'Read an analog clock and match the digital time',    route: '/time',         subject: 'time',        unlockLevel: 1 },
-  { id:'s10', emoji: '⚡',  label: '3-Digit Carry',       description: 'Advanced column math — carry over two columns',      route: '/carry-borrow', subject: 'carry-borrow',unlockLevel: 4 },
-  { id:'s11', emoji: '📖',  label: 'Simple Sentences',    description: 'Arrange scrambled words to build correct sentences',  route: '/sentences',    subject: 'sentences',   unlockLevel: 1 },
-  { id:'s12', emoji: '🧮',  label: 'Multiplication',      description: 'Times tables through the Math Engine Level 4',       route: '/math',         subject: 'mathematics', unlockLevel: 4 },
+  { id: 's1',  emoji: '1️⃣',  label: '1-Digit Math',        description: 'Counting, addition + subtraction with visual blocks',   route: '/math',                subject: 'mathematics',    unlockLevel: 1 },
+  { id: 's2',  emoji: '📝',  label: 'ABC & Letters',        description: 'Alphabet recognition, phonics, letter sounds',           route: '/alphabet',            subject: 'alphabet',       unlockLevel: 1 },
+  { id: 's3',  emoji: '🎨',  label: 'Colors & Shapes',      description: '12 colors and 9 geometric shapes with fun facts',        route: '/colors',              subject: 'colors',         unlockLevel: 1 },
+  { id: 's4',  emoji: '📦',  label: 'Carry & Borrow',       description: 'Column addition with carry — the core math skill',       route: '/carry-borrow',        subject: 'carry-borrow',   unlockLevel: 1 },
+  { id: 's5',  emoji: '🔤',  label: '2–3 Letter Words',     description: 'Sight words, missing letters, basic spelling',           route: '/english',             subject: 'english',        unlockLevel: 1 },
+  { id: 's6',  emoji: '🧩',  label: 'Patterns & Logic',     description: 'Complete emoji sequences — develop logical thinking',    route: '/patterns',            subject: 'patterns',       unlockLevel: 1 },
+  { id: 's7',  emoji: '🔢',  label: '2-Digit Math',         description: 'Addition + subtraction up to 99 with column layout',     route: '/math',                subject: 'mathematics',    unlockLevel: 2 },
+  { id: 's8',  emoji: '🔡',  label: '4–5 Letter Spelling',  description: 'Spell Builder — arrange letters to form words',          route: '/spelling',            subject: 'spelling',       unlockLevel: 1 },
+  { id: 's9',  emoji: '🕐',  label: 'Telling Time',         description: 'Read an analog clock and match the digital time',       route: '/time',                subject: 'time',           unlockLevel: 1 },
+  { id: 's10', emoji: '⚡',  label: '3-Digit Carry',        description: 'Advanced column math — carry over two columns',          route: '/carry-borrow',        subject: 'carry-borrow',   unlockLevel: 4 },
+  { id: 's11', emoji: '🏎️', label: 'Multiplication Race',  description: 'Beat the clock on ×tables — from ×2 up to ×12',         route: '/multiplication-race', subject: 'multiplication', unlockLevel: 1 },
+  { id: 's12', emoji: '➗',  label: 'Division Splitter',    description: 'Share items equally into groups — visual division',      route: '/division-splitter',   subject: 'division',       unlockLevel: 1 },
+  { id: 's13', emoji: '📖',  label: 'Simple Sentences',     description: 'Arrange scrambled words to build correct sentences',     route: '/sentences',           subject: 'sentences',      unlockLevel: 1 },
+  { id: 's14', emoji: '🧮',  label: 'Advanced Math',        description: 'Times tables and multi-digit arithmetic — Level 4+',    route: '/math',                subject: 'mathematics',    unlockLevel: 4 },
 ];
 
 const LEVEL_LABELS: Record<number, string> = {
@@ -41,7 +43,15 @@ function useMultiProgress() {
   const cb = useSubjectProgress('carry-borrow');
   const math = useSubjectProgress('mathematics');
   const eng = useSubjectProgress('english');
-  return { 'carry-borrow': cb.progress, mathematics: math.progress, english: eng.progress };
+  const mult = useSubjectProgress('multiplication');
+  const div = useSubjectProgress('division');
+  return {
+    'carry-borrow': cb.progress,
+    mathematics: math.progress,
+    english: eng.progress,
+    multiplication: mult.progress,
+    division: div.progress,
+  };
 }
 
 export default function LearningPathPage() {
@@ -61,6 +71,31 @@ export default function LearningPathPage() {
           </p>
           <AuthButton />
           <Link href="/" className="block mt-4 text-sm text-[#6b6b6b] hover:text-[#0070cc] transition-colors">
+            ← Back to games
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Hard premium gate — learning path is a premium feature
+  if (!authLoading && user && !isPremium) {
+    return (
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-6 px-6">
+        <div
+          className="bg-white rounded-[24px] p-10 max-w-md w-full text-center"
+          style={{ boxShadow: 'rgba(0,0,0,0.08) 0 5px 9px 0' }}
+        >
+          <div className="text-5xl mb-5">⭐</div>
+          <h2 className="text-[28px] font-light text-black mb-3">Premium Feature</h2>
+          <p className="text-[#6b6b6b] text-sm leading-relaxed mb-6">
+            The structured Learning Path is a Premium feature. It guides your child through
+            12 milestones — from counting to multiplication — with a saved, personalised route.
+          </p>
+          <Link href="/upgrade" className="ps-btn block text-center mb-3">
+            Upgrade to Premium →
+          </Link>
+          <Link href="/" className="block mt-2 text-sm text-[#6b6b6b] hover:text-[#0070cc] transition-colors">
             ← Back to games
           </Link>
         </div>
