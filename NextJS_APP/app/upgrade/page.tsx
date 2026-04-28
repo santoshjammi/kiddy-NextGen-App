@@ -2,10 +2,17 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { getFunctions, httpsCallable } from 'firebase/functions';
 import AuthButton from '../../components/AuthButton';
 import { useFirebase } from '../../components/FirebaseProvider';
 import { useRewards } from '../../components/useRewards';
+
+// Razorpay billing is enabled once Firebase Functions are deployed with the
+// RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET secrets configured.
+// Set this to true after running:  firebase deploy --only functions
+const RAZORPAY_BILLING_ENABLED = false;
+
+// Razorpay monthly plan amount in smallest currency unit (paise): ₹299 = 29900
+const RAZORPAY_AMOUNT_PAISE = 29900;
 
 const OUTCOME_TRACKS = [
   {
@@ -44,8 +51,8 @@ export default function UpgradePage() {
   const [trialLoading, setTrialLoading] = useState(false);
   const [trialError, setTrialError] = useState('');
   const [trialStarted, setTrialStarted] = useState(false);
-  const [stripeLoading, setStripeLoading] = useState(false);
-  const [stripeError, setStripeError] = useState('');
+  const [payLoading, setPayLoading] = useState(false);
+  const [payError, setPayError] = useState('');
 
   const handleStartTrial = async () => {
     if (!user) return;
@@ -63,19 +70,62 @@ export default function UpgradePage() {
   };
 
   const handleSubscribe = async () => {
-    if (!user) return;
-    setStripeLoading(true);
-    setStripeError('');
+    if (!user || !RAZORPAY_BILLING_ENABLED) return;
+    setPayLoading(true);
+    setPayError('');
     try {
-      const functions = getFunctions(undefined, 'asia-south1');
-      const createSession = httpsCallable<unknown, { url: string }>(functions, 'createCheckoutSession');
-      const result = await createSession({});
-      if (result.data.url) {
-        window.location.href = result.data.url;
+      // 1. Create a Razorpay order on the server
+      const { getFunctions, httpsCallable } = await import('firebase/functions');
+      const { app } = await import('../../firestore');
+      const fns = getFunctions(app, 'asia-south1');
+      const createOrder = httpsCallable<unknown, { orderId: string; amount: number; currency: string; keyId: string }>(fns, 'createRazorpayOrder');
+      const { data } = await createOrder({});
+
+      // 2. Open Razorpay checkout (script loaded in layout or dynamically here)
+      const Razorpay = (window as unknown as { Razorpay: new (opts: unknown) => { open(): void } }).Razorpay;
+      if (!Razorpay) {
+        // Dynamically load the Razorpay script if not already present
+        await new Promise<void>((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          s.onload = () => resolve();
+          s.onerror = () => reject(new Error('Failed to load Razorpay SDK'));
+          document.head.appendChild(s);
+        });
       }
+      const rzp = new (window as unknown as { Razorpay: new (opts: unknown) => { open(): void } }).Razorpay({
+        key: data.keyId,
+        amount: data.amount,
+        currency: data.currency,
+        name: 'Kiddy Learning',
+        description: 'Kiddy Premium — ₹299/month',
+        order_id: data.orderId,
+        prefill: {
+          email: user.email ?? '',
+          name: user.displayName ?? '',
+        },
+        theme: { color: '#0070cc' },
+        handler: async (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) => {
+          // 3. Verify payment on server — activates premium in Firestore
+          const verifyPayment = httpsCallable<unknown, { success: boolean }>(fns, 'verifyRazorpayPayment');
+          const verify = await verifyPayment(response);
+          if (verify.data.success) {
+            window.location.href = '/payment-success';
+          } else {
+            setPayError('Payment verification failed. Please contact support.');
+            setPayLoading(false);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setPayLoading(false);
+          },
+        },
+      });
+      rzp.open();
     } catch {
-      setStripeError('Unable to start checkout. Please try again or contact support.');
-      setStripeLoading(false);
+      setPayError('Unable to start checkout. Please try again.');
+      setPayLoading(false);
     }
   };
 
@@ -165,16 +215,32 @@ export default function UpgradePage() {
                 <span className="text-[#6b6b6b] text-xs uppercase tracking-wider">or</span>
                 <div className="h-px bg-[#1a1a1a] flex-1" />
               </div>
-              {/* Stripe Checkout */}
-              <button
-                onClick={handleSubscribe}
-                disabled={stripeLoading}
-                className="ps-btn bg-[#003791] text-white font-bold hover:bg-[#002a6e] disabled:opacity-60"
-              >
-                {stripeLoading ? 'Redirecting to checkout...' : 'Subscribe — ₹299/month'}
-              </button>
-              {stripeError && <p className="text-red-400 text-xs mt-1">{stripeError}</p>}
-              <p className="text-[#444] text-xs">Secure checkout via Stripe · Cancel anytime</p>
+              {/* Razorpay Checkout */}
+              {RAZORPAY_BILLING_ENABLED ? (
+                <>
+                  <button
+                    onClick={handleSubscribe}
+                    disabled={payLoading}
+                    className="ps-btn bg-[#003791] text-white font-bold hover:bg-[#002a6e] disabled:opacity-60"
+                  >
+                    {payLoading ? 'Opening checkout...' : 'Subscribe — ₹299/month'}
+                  </button>
+                  {payError && <p className="text-red-400 text-xs mt-1">{payError}</p>}
+                  <p className="text-[#444] text-xs">Secure checkout via Razorpay · Cancel anytime</p>
+                </>
+              ) : (
+                <div className="flex flex-col items-center gap-1">
+                  <button
+                    disabled
+                    className="ps-btn bg-[#0d0d0d] border border-[#1a1a1a] text-[#6b6b6b] cursor-not-allowed opacity-70"
+                  >
+                    Subscribe — ₹299/month (coming soon)
+                  </button>
+                  <p className="text-[#444] text-xs text-center">
+                    Paid billing is in setup · Start your free 7-day trial above in the meantime
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>

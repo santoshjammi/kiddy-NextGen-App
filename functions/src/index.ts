@@ -1,41 +1,45 @@
 /**
  * Kiddy Firebase Cloud Functions
- * 
- * Handles Stripe billing integration:
- *   - createCheckoutSession: creates a Stripe Checkout session for ₹299/month
- *   - stripeWebhook: handles Stripe webhook events to activate premium access
- * 
+ *
+ * Handles Razorpay billing integration:
+ *   - createRazorpayOrder:    creates a Razorpay order for ₹299/month (callable)
+ *   - verifyRazorpayPayment:  verifies HMAC signature, activates premium (callable)
+ *
  * Setup:
  *   1. Set Firebase secrets:
- *      firebase functions:secrets:set STRIPE_SECRET_KEY
- *      firebase functions:secrets:set STRIPE_WEBHOOK_SECRET
- *      firebase functions:secrets:set STRIPE_PRICE_ID
- *   2. Create a product + price in Stripe Dashboard:
- *      Product: "Kiddy Premium", Price: ₹299/month recurring
- *   3. Deploy: firebase deploy --only functions
- *   4. Add Stripe webhook endpoint in Stripe Dashboard:
- *      URL: https://<region>-<project>.cloudfunctions.net/stripeWebhook
- *      Event: checkout.session.completed
- *   5. Update the upgrade page with the deployed function URL
+ *        firebase functions:secrets:set RAZORPAY_KEY_ID
+ *        firebase functions:secrets:set RAZORPAY_KEY_SECRET
+ *   2. Deploy:
+ *        cd functions && npm install && cd ..
+ *        firebase deploy --only functions
+ *   3. In app/upgrade/page.tsx set:
+ *        const RAZORPAY_BILLING_ENABLED = true;
+ *
+ * Razorpay does NOT use separate webhooks for the basic integration — the
+ * client receives payment ID + signature and calls verifyRazorpayPayment.
+ * The optional razorpayWebhook function handles subscription lifecycle events.
  */
 
 import { onCall, onRequest, HttpsError } from 'firebase-functions/v2/https';
 import { defineSecret } from 'firebase-functions/params';
 import * as admin from 'firebase-admin';
+import * as crypto from 'crypto';
 
 admin.initializeApp();
 
-const stripeSecretKey = defineSecret('STRIPE_SECRET_KEY');
-const stripeWebhookSecret = defineSecret('STRIPE_WEBHOOK_SECRET');
-const stripePriceId = defineSecret('STRIPE_PRICE_ID');
+const razorpayKeyId = defineSecret('RAZORPAY_KEY_ID');
+const razorpayKeySecret = defineSecret('RAZORPAY_KEY_SECRET');
 
-// ── createCheckoutSession ─────────────────────────────────────────
-// Called from the client (upgrade page) when the parent clicks "Subscribe"
-// Returns a Stripe Checkout session URL to redirect to.
-export const createCheckoutSession = onCall(
+// ₹299 in paise (smallest unit)
+const AMOUNT_PAISE = 29900;
+
+// ── createRazorpayOrder ───────────────────────────────────────────
+// Called from the client when the parent clicks "Subscribe ₹299/month".
+// Creates a Razorpay order and returns orderId + public key_id to the client.
+export const createRazorpayOrder = onCall(
   {
-    secrets: [stripeSecretKey, stripePriceId],
-    region: 'asia-south1', // Mumbai — closest to India
+    secrets: [razorpayKeyId, razorpayKeySecret],
+    region: 'asia-south1',
   },
   async (request) => {
     if (!request.auth) {
@@ -43,129 +47,158 @@ export const createCheckoutSession = onCall(
     }
 
     const uid = request.auth.uid;
-    const email = request.auth.token.email ?? '';
 
-    // Dynamically import Stripe (installed as production dep)
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const Stripe = require('stripe');
-    const stripe = new Stripe(stripeSecretKey.value(), { apiVersion: '2024-06-20' });
-
-    // Determine success/cancel URLs — update with your actual domain
-    const appUrl = 'https://kiddy.app'; // TODO: replace with actual domain
-    const successUrl = `${appUrl}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${appUrl}/upgrade?payment=cancelled`;
+    const Razorpay = require('razorpay');
+    const rzp = new Razorpay({
+      key_id: razorpayKeyId.value(),
+      key_secret: razorpayKeySecret.value(),
+    });
 
     try {
-      const session = await stripe.checkout.sessions.create({
-        mode: 'subscription',
-        payment_method_types: ['card'],
-        customer_email: email,
-        line_items: [
-          {
-            price: stripePriceId.value(),
-            quantity: 1,
-          },
-        ],
-        success_url: successUrl,
-        cancel_url: cancelUrl,
-        metadata: {
-          firebaseUid: uid,
-        },
-        subscription_data: {
-          metadata: { firebaseUid: uid },
-        },
-        // Allow Indian payment methods
-        payment_method_options: {
-          card: {
-            request_three_d_secure: 'automatic',
-          },
-        },
+      const order = await rzp.orders.create({
+        amount: AMOUNT_PAISE,
+        currency: 'INR',
+        receipt: `kiddy_${uid}_${Date.now()}`,
+        notes: { firebaseUid: uid },
       });
 
-      return { url: session.url };
-    } catch (error: unknown) {
-      console.error('Stripe session creation failed:', error);
-      throw new HttpsError('internal', 'Failed to create checkout session.');
+      return {
+        orderId: order.id as string,
+        amount: order.amount as number,
+        currency: order.currency as string,
+        keyId: razorpayKeyId.value(),
+      };
+    } catch (error) {
+      console.error('Razorpay order creation failed:', error);
+      throw new HttpsError('internal', 'Failed to create payment order.');
     }
   }
 );
 
-// ── stripeWebhook ─────────────────────────────────────────────────
-// Stripe calls this URL after a successful payment.
-// Verifies the signature and activates premium in Firestore.
-export const stripeWebhook = onRequest(
+// ── verifyRazorpayPayment ─────────────────────────────────────────
+// Called from the client after Razorpay handler() fires.
+// Verifies the payment signature and activates premium in Firestore.
+export const verifyRazorpayPayment = onCall(
   {
-    secrets: [stripeSecretKey, stripeWebhookSecret],
+    secrets: [razorpayKeySecret],
+    region: 'asia-south1',
+  },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError('unauthenticated', 'Must be signed in.');
+    }
+
+    const uid = request.auth.uid;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+      request.data as {
+        razorpay_order_id: string;
+        razorpay_payment_id: string;
+        razorpay_signature: string;
+      };
+
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      throw new HttpsError('invalid-argument', 'Missing payment verification fields.');
+    }
+
+    // Verify HMAC-SHA256 signature
+    const expectedSignature = crypto
+      .createHmac('sha256', razorpayKeySecret.value())
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest('hex');
+
+    if (expectedSignature !== razorpay_signature) {
+      console.error(`Signature mismatch for uid ${uid}`);
+      throw new HttpsError('permission-denied', 'Payment signature verification failed.');
+    }
+
+    // Activate premium in Firestore using Admin SDK (bypasses security rules)
+    try {
+      await admin
+        .firestore()
+        .doc(`users/${uid}/rewards/current`)
+        .set(
+          {
+            isPremium: true,
+            premiumActivatedAt: new Date().toISOString(),
+            subscriptionStatus: 'active',
+            razorpayPaymentId: razorpay_payment_id,
+            razorpayOrderId: razorpay_order_id,
+          },
+          { merge: true }
+        );
+
+      console.log(`Premium activated for uid: ${uid}, payment: ${razorpay_payment_id}`);
+      return { success: true };
+    } catch (error) {
+      console.error('Firestore write failed:', error);
+      throw new HttpsError('internal', 'Failed to activate premium.');
+    }
+  }
+);
+
+// ── razorpayWebhook ───────────────────────────────────────────────
+// Optional: handle Razorpay webhook events for subscription lifecycle.
+// Configure in Razorpay Dashboard → Settings → Webhooks.
+// Events to subscribe: payment.captured, subscription.cancelled
+export const razorpayWebhook = onRequest(
+  {
+    secrets: [razorpayKeySecret],
     region: 'asia-south1',
   },
   async (req, res) => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const Stripe = require('stripe');
-    const stripe = new Stripe(stripeSecretKey.value(), { apiVersion: '2024-06-20' });
+    const webhookSecret = razorpayKeySecret.value();
+    const signature = req.headers['x-razorpay-signature'] as string;
 
-    const sig = req.headers['stripe-signature'] as string;
-    if (!sig) {
-      res.status(400).send('Missing stripe-signature header');
+    if (!signature) {
+      res.status(400).send('Missing x-razorpay-signature header');
       return;
     }
 
-    let event: ReturnType<typeof stripe.webhooks.constructEvent>;
-    try {
-      // req.rawBody is available in Firebase Functions v2
-      event = stripe.webhooks.constructEvent(
-        (req as unknown as { rawBody: Buffer }).rawBody,
-        sig,
-        stripeWebhookSecret.value()
-      );
-    } catch (err: unknown) {
-      console.error('Webhook signature verification failed:', err);
+    // Verify webhook signature
+    const rawBody = (req as unknown as { rawBody: Buffer }).rawBody;
+    const expectedSig = crypto
+      .createHmac('sha256', webhookSecret)
+      .update(rawBody)
+      .digest('hex');
+
+    if (expectedSig !== signature) {
       res.status(400).send('Webhook signature verification failed');
       return;
     }
 
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as {
-        metadata?: { firebaseUid?: string };
-        customer?: string;
-        subscription?: string;
-        customer_email?: string;
+    const event = req.body as {
+      event: string;
+      payload?: {
+        payment?: { entity?: { notes?: { firebaseUid?: string }; id?: string } };
+        subscription?: { entity?: { notes?: { firebaseUid?: string } } };
       };
+    };
 
-      const uid = session.metadata?.firebaseUid;
-      if (!uid) {
-        console.error('No firebaseUid in session metadata');
-        res.status(400).send('No firebaseUid in metadata');
-        return;
-      }
-
-      try {
-        // Write premium status to Firestore using Admin SDK (bypasses security rules)
-        await admin.firestore()
+    if (event.event === 'payment.captured') {
+      const uid = event.payload?.payment?.entity?.notes?.firebaseUid;
+      const paymentId = event.payload?.payment?.entity?.id;
+      if (uid) {
+        await admin
+          .firestore()
           .doc(`users/${uid}/rewards/current`)
           .set(
             {
               isPremium: true,
               premiumActivatedAt: new Date().toISOString(),
               subscriptionStatus: 'active',
-              stripeCustomerId: session.customer ?? null,
-              stripeSubscriptionId: session.subscription ?? null,
+              razorpayPaymentId: paymentId ?? null,
             },
             { merge: true }
-          );
-
-        console.log(`Premium activated for uid: ${uid}`);
-        res.status(200).json({ received: true });
-      } catch (error) {
-        console.error('Firestore write failed:', error);
-        res.status(500).send('Firestore write failed');
-        return;
+          )
+          .catch(console.error);
+        console.log(`Webhook: premium activated for uid ${uid}`);
       }
-    } else if (event.type === 'customer.subscription.deleted') {
-      // Handle cancellation — downgrade to free
-      const subscription = event.data.object as { metadata?: { firebaseUid?: string } };
-      const uid = subscription.metadata?.firebaseUid;
+    } else if (event.event === 'subscription.cancelled') {
+      const uid = event.payload?.subscription?.entity?.notes?.firebaseUid;
       if (uid) {
-        await admin.firestore()
+        await admin
+          .firestore()
           .doc(`users/${uid}/rewards/current`)
           .set(
             {
@@ -175,12 +208,12 @@ export const stripeWebhook = onRequest(
             { merge: true }
           )
           .catch(console.error);
-        console.log(`Premium cancelled for uid: ${uid}`);
+        console.log(`Webhook: premium cancelled for uid ${uid}`);
       }
-      res.status(200).json({ received: true });
-    } else {
-      // Acknowledge other events
-      res.status(200).json({ received: true });
     }
+
+    res.status(200).json({ received: true });
   }
 );
+
+
