@@ -2,31 +2,83 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import AuthButton from '../../components/AuthButton';
+import { useFirebase } from '../../components/FirebaseProvider';
+import { useRewards } from '../../components/useRewards';
 
-const FREE_FEATURES = [
-  '18 interactive learning games',
-  'Alphabet, Numbers, Shapes & Colors',
-  'Math Engine (4 operations)',
-  'English Word Builder',
-  'Missing Letter game',
-  'Letter Fishing phonics',
-  'Basic play — no sign-in required',
+const OUTCOME_TRACKS = [
+  {
+    icon: '🏆',
+    title: '7-Day Math Confidence Challenge',
+    body: 'Your child goes from dreading sums to solving carry-overs with ease. Structured daily practice, adaptive difficulty.',
+  },
+  {
+    icon: '📖',
+    title: 'Spelling Champion Program',
+    body: 'From missing letters to building real words. Phonics, vowels, and vocabulary — all in 10 minutes a day.',
+  },
+  {
+    icon: '🏎️',
+    title: 'Multiplication Master Track',
+    body: 'Times tables mastered in 3 weeks. Race-style games that make memorization feel like winning.',
+  },
 ];
 
-const PREMIUM_FEATURES = [
-  'Full Structured Learning Path (12 steps)',
-  'Carry & Borrow Grid (highest-value game)',
-  'Adaptive difficulty that grows with your child',
-  'Parent Dashboard with progress analytics',
-  'Weak-area detection & priority recommendations',
-  'Reward Engine — badges, streaks & points',
-  'Session history & improvement charts',
-  'Priority support',
+const COMPARISON = [
+  { feature: 'All 21 learning games', free: true, premium: true },
+  { feature: 'Parent Dashboard — basic view', free: true, premium: true },
+  { feature: 'Reward system (points, badges)', free: true, premium: true },
+  { feature: 'Structured 14-Step Learning Path', free: false, premium: true },
+  { feature: 'Personalised daily practice plan', free: false, premium: true },
+  { feature: 'Weak area detection & analysis', free: false, premium: true },
+  { feature: 'Carry & Borrow structured grid', free: false, premium: true },
+  { feature: 'Adaptive difficulty per child', free: false, premium: true },
+  { feature: 'Session time tracking', free: false, premium: true },
+  { feature: 'Weekly progress story', free: false, premium: true },
 ];
 
 export default function UpgradePage() {
-  const [waitlisted, setWaitlisted] = useState(false);
+  const { user, isTrial, trialDaysLeft, isPremium } = useFirebase();
+  const { startTrial } = useRewards();
+  const [trialLoading, setTrialLoading] = useState(false);
+  const [trialError, setTrialError] = useState('');
+  const [trialStarted, setTrialStarted] = useState(false);
+  const [stripeLoading, setStripeLoading] = useState(false);
+  const [stripeError, setStripeError] = useState('');
+
+  const handleStartTrial = async () => {
+    if (!user) return;
+    setTrialLoading(true);
+    setTrialError('');
+    const result = await startTrial();
+    setTrialLoading(false);
+    if (result.success) {
+      setTrialStarted(true);
+    } else if (result.error === 'trial_already_used') {
+      setTrialError('Your free trial has already been used on this account.');
+    } else {
+      setTrialError('Something went wrong. Please try again.');
+    }
+  };
+
+  const handleSubscribe = async () => {
+    if (!user) return;
+    setStripeLoading(true);
+    setStripeError('');
+    try {
+      const functions = getFunctions(undefined, 'asia-south1');
+      const createSession = httpsCallable<unknown, { url: string }>(functions, 'createCheckoutSession');
+      const result = await createSession({});
+      if (result.data.url) {
+        window.location.href = result.data.url;
+      }
+    } catch {
+      setStripeError('Unable to start checkout. Please try again or contact support.');
+      setStripeLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black">
 
@@ -34,139 +86,179 @@ export default function UpgradePage() {
       <header className="bg-black border-b border-[#1a1a1a] sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="ps-btn ps-btn-sm ps-btn-ghost-dark">← Back</Link>
-          <h1 className="text-[20px] font-light text-white">Upgrade to Premium</h1>
+          <h1 className="text-[20px] font-light text-white">Unlock Premium</h1>
           <AuthButton />
         </div>
       </header>
+
+      {/* ── Trial active banner ───────────────────────────── */}
+      {isTrial && (
+        <div className="bg-[#0070cc] text-white text-center py-3 px-6">
+          <p className="text-sm font-semibold">
+            🎉 Your free trial is active — <span className="font-bold">{trialDaysLeft} day{trialDaysLeft !== 1 ? 's' : ''}</span> remaining
+          </p>
+        </div>
+      )}
+
+      {/* ── Already premium banner ────────────────────────── */}
+      {isPremium && !isTrial && (
+        <div className="bg-[#003791] text-white text-center py-3 px-6">
+          <p className="text-sm font-semibold">✅ You&apos;re on Premium — full access is active</p>
+        </div>
+      )}
 
       {/* ── Hero ──────────────────────────────────────────────── */}
       <section className="bg-black py-16 px-6 text-center border-b border-[#1a1a1a]">
         <div className="max-w-2xl mx-auto flex flex-col gap-6">
           <div className="text-[64px]">🚀</div>
           <h2 className="text-[36px] md:text-[48px] font-bold text-white leading-tight">
-            Your child improves through<br />
-            <span style={{ color: '#0070cc' }}>15 minutes of structured practice</span>
+            Real improvement<br />
+            in <span style={{ color: '#0070cc' }}>15 minutes a day</span>
           </h2>
           <p className="text-[#6b6b6b] text-lg leading-relaxed max-w-xl mx-auto">
-            Kiddy Premium is designed for parents who want to see real, measurable improvement
-            — not just play time. Track progress, spot weaknesses early, and celebrate every milestone.
+            Kiddy Premium turns screen time into measurable learning.
+            Parents see the difference in weeks — not months.
           </p>
+
+          {/* Primary CTA */}
+          {!user ? (
+            <div className="flex flex-col items-center gap-3">
+              <p className="text-[#6b6b6b] text-sm">Sign in to start your free trial</p>
+              <AuthButton />
+            </div>
+          ) : trialStarted ? (
+            <div className="flex flex-col items-center gap-3">
+              <div className="text-5xl">🎉</div>
+              <p className="text-white text-lg font-semibold">7-Day Trial Activated!</p>
+              <p className="text-[#6b6b6b] text-sm">You now have full premium access for 7 days.</p>
+              <Link href="/parent" className="ps-btn bg-[#0070cc] text-white font-bold hover:bg-[#0060bb]">
+                View Dashboard →
+              </Link>
+            </div>
+          ) : isTrial ? (
+            <div className="flex flex-col items-center gap-3">
+              <p className="text-white/70 text-sm">Trial active — {trialDaysLeft} days remaining</p>
+              <Link href="/parent" className="ps-btn bg-[#0070cc] text-white font-bold hover:bg-[#0060bb]">
+                Go to Dashboard →
+              </Link>
+            </div>
+          ) : isPremium ? (
+            <div className="flex flex-col items-center gap-3">
+              <p className="text-white/70 text-sm">You already have premium access</p>
+              <Link href="/parent" className="ps-btn bg-[#0070cc] text-white font-bold hover:bg-[#0060bb]">
+                View Dashboard →
+              </Link>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-4">
+              <button
+                onClick={handleStartTrial}
+                disabled={trialLoading}
+                className="ps-btn bg-[#0070cc] text-white font-bold text-lg px-10 py-4 hover:bg-[#0060bb] disabled:opacity-60"
+              >
+                {trialLoading ? 'Activating...' : 'Start 7-Day Free Trial →'}
+              </button>
+              <p className="text-[#6b6b6b] text-xs">No credit card needed · One trial per account · Cancel anytime</p>
+              {trialError && <p className="text-red-400 text-sm">{trialError}</p>}
+              <div className="flex items-center gap-3 mt-2">
+                <div className="h-px bg-[#1a1a1a] flex-1" />
+                <span className="text-[#6b6b6b] text-xs uppercase tracking-wider">or</span>
+                <div className="h-px bg-[#1a1a1a] flex-1" />
+              </div>
+              {/* Stripe Checkout */}
+              <button
+                onClick={handleSubscribe}
+                disabled={stripeLoading}
+                className="ps-btn bg-[#003791] text-white font-bold hover:bg-[#002a6e] disabled:opacity-60"
+              >
+                {stripeLoading ? 'Redirecting to checkout...' : 'Subscribe — ₹299/month'}
+              </button>
+              {stripeError && <p className="text-red-400 text-xs mt-1">{stripeError}</p>}
+              <p className="text-[#444] text-xs">Secure checkout via Stripe · Cancel anytime</p>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* ── Plans ─────────────────────────────────────────────── */}
-      <section className="py-16 px-6">
-        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-
-          {/* Free plan */}
-          <div
-            className="bg-white rounded-[24px] p-8 flex flex-col gap-6"
-            style={{ boxShadow: 'rgba(0,0,0,0.06) 0 4px 16px 0' }}
-          >
-            <div>
-              <p className="text-xs text-[#6b6b6b] uppercase tracking-widest mb-2">Free</p>
-              <p className="text-[40px] font-bold text-gray-900">₹0<span className="text-base font-normal text-gray-400">/month</span></p>
-              <p className="text-gray-500 text-sm mt-1">Always free — explore all games</p>
-            </div>
-            <ul className="flex flex-col gap-3 flex-1">
-              {FREE_FEATURES.map(f => (
-                <li key={f} className="flex items-start gap-3 text-sm text-gray-700">
-                  <span className="text-green-500 font-bold mt-0.5">✓</span>
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
-            <Link
-              href="/"
-              className="ps-btn w-full text-center bg-[#f5f7fa] hover:bg-[#ebebeb] text-gray-700 border-0 py-3 rounded-[12px] font-semibold"
-            >
-              Start Playing Free
-            </Link>
+      {/* ── Outcome tracks ──────────────────────────────────── */}
+      <section className="py-16 px-6 border-b border-[#1a1a1a]">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-white text-2xl font-bold text-center mb-10">Outcomes, not subscriptions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {OUTCOME_TRACKS.map(({ icon, title, body }) => (
+              <div
+                key={title}
+                className="bg-[#0d0d0d] border border-[#1a1a1a] rounded-[20px] p-6 flex flex-col gap-4"
+              >
+                <div className="text-[48px]">{icon}</div>
+                <h3 className="text-white font-semibold text-lg leading-tight">{title}</h3>
+                <p className="text-[#6b6b6b] text-sm leading-relaxed">{body}</p>
+              </div>
+            ))}
           </div>
+        </div>
+      </section>
 
-          {/* Premium plan */}
-          <div
-            className="rounded-[24px] p-8 flex flex-col gap-6 relative overflow-hidden"
-            style={{
-              background: 'linear-gradient(145deg, #003791 0%, #0070cc 100%)',
-              boxShadow: 'rgba(0,112,204,0.35) 0 8px 32px 0',
-            }}
-          >
-            {/* Badge */}
-            <div className="absolute top-6 right-6 bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">
-              BEST VALUE
+      {/* ── Plans comparison ─────────────────────────────────── */}
+      <section className="py-16 px-6 border-b border-[#1a1a1a]">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-white text-2xl font-bold text-center mb-10">Free vs Premium</h2>
+          <div className="bg-[#0d0d0d] border border-[#1a1a1a] rounded-[20px] overflow-hidden">
+            <div className="grid grid-cols-3 gap-0 border-b border-[#1a1a1a] bg-black px-6 py-4">
+              <span className="text-[#6b6b6b] text-sm font-semibold">Feature</span>
+              <span className="text-[#6b6b6b] text-sm font-semibold text-center">Free</span>
+              <span className="text-[#0070cc] text-sm font-semibold text-center">Premium</span>
             </div>
-
-            <div>
-              <p className="text-xs text-white/60 uppercase tracking-widest mb-2">Premium</p>
-              <p className="text-[40px] font-bold text-white">₹299<span className="text-base font-normal text-white/60">/month</span></p>
-              <p className="text-white/70 text-sm mt-1">Cancel anytime — no lock-in</p>
-            </div>
-            <ul className="flex flex-col gap-3 flex-1">
-              {PREMIUM_FEATURES.map(f => (
-                <li key={f} className="flex items-start gap-3 text-sm text-white">
-                  <span className="text-yellow-300 font-bold mt-0.5">★</span>
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
-            <button
-              className={`w-full font-bold py-3 rounded-[12px] transition-colors ${
-                waitlisted
-                  ? 'bg-green-100 text-green-700 cursor-default'
-                  : 'bg-white text-[#003791] hover:bg-yellow-50'
-              }`}
-              onClick={() => setWaitlisted(true)}
-              disabled={waitlisted}
-            >
-              {waitlisted ? '✓ You\'re on the waitlist!' : 'Join the Waitlist →'}
-            </button>
-            <p className="text-center text-white/50 text-xs -mt-3">
-              {waitlisted ? 'We\'ll email you when billing goes live.' : 'Billing coming soon — be first to know'}
-            </p>
+            {COMPARISON.map(({ feature, free, premium }) => (
+              <div key={feature} className="grid grid-cols-3 gap-0 px-6 py-3.5 border-b border-[#1a1a1a] last:border-0">
+                <span className="text-white text-sm">{feature}</span>
+                <span className="text-center text-lg">{free ? '✅' : '—'}</span>
+                <span className="text-center text-lg">{premium ? '✅' : '—'}</span>
+              </div>
+            ))}
           </div>
-
         </div>
       </section>
 
-      {/* ── Trust strip ───────────────────────────────────────── */}
-      <section className="py-12 px-6 bg-[#0d0d0d] border-t border-[#1a1a1a]">
-        <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-          {[
-            { icon: '📊', title: 'Measurable Progress', body: 'Parents see exactly where their child is struggling and improving week over week.' },
-            { icon: '🎯', title: 'Adaptive Difficulty', body: 'The system automatically adjusts challenge level to keep kids in their optimal learning zone.' },
-            { icon: '🏆', title: 'Built-in Motivation', body: 'Badges, streaks, and a reward engine keep children engaged without screen-time battles.' },
-          ].map(({ icon, title, body }) => (
-            <div key={title} className="flex flex-col items-center gap-3">
-              <div className="text-[48px]">{icon}</div>
-              <h3 className="text-white font-semibold">{title}</h3>
-              <p className="text-[#6b6b6b] text-sm leading-relaxed">{body}</p>
+      {/* ── Pricing ──────────────────────────────────────────── */}
+      <section className="py-16 px-6 border-b border-[#1a1a1a]">
+        <div className="max-w-2xl mx-auto text-center flex flex-col gap-6">
+          <h2 className="text-white text-2xl font-bold">Simple pricing</h2>
+          <div
+            className="bg-[#0d0d0d] border border-[#0070cc]/40 rounded-[24px] p-8 flex flex-col items-center gap-4"
+            style={{ boxShadow: 'rgba(0,112,204,0.15) 0 8px 24px 0' }}
+          >
+            <span className="text-[#0070cc] text-sm font-semibold uppercase tracking-widest">Premium Plan</span>
+            <div className="text-[52px] font-bold text-white">
+              ₹299<span className="text-lg font-normal text-[#6b6b6b]">/month</span>
             </div>
-          ))}
+            <p className="text-[#6b6b6b] text-sm">Full access · Adaptive learning · Parent dashboard · Cancel anytime</p>
+            <p className="text-[#0070cc] text-sm font-semibold">Start free for 7 days — no card required</p>
+          </div>
         </div>
       </section>
 
-      {/* ── FAQ / What you get ─────────────────────────────────── */}
+      {/* ── FAQ ─────────────────────────────────────────────── */}
       <section className="py-12 px-6 border-t border-[#1a1a1a]">
         <div className="max-w-2xl mx-auto">
           <h2 className="text-white text-2xl font-bold text-center mb-8">Common questions</h2>
           <div className="flex flex-col gap-4">
             {[
               {
-                q: 'Can I try before subscribing?',
-                a: 'Yes — all 18 games are free forever. Premium unlocks the structured learning path, parent analytics, and reward engine on top of the free games.',
+                q: 'What happens after the 7-day trial?',
+                a: 'Your trial ends and access returns to the free tier. Billing will be available shortly — you\'ll receive an email when it\'s ready to subscribe.',
               },
               {
-                q: 'When is billing available?',
-                a: 'We\'re in the final stages of setting up secure billing. Join the waitlist and you\'ll be first to access it — often with an early-adopter discount.',
+                q: 'Can I use it on any device?',
+                a: 'Yes — Kiddy works on phones, tablets, and desktops. Progress syncs across devices when signed in.',
               },
               {
                 q: 'What age group is this for?',
                 a: 'Kiddy is optimised for kindergarten to Grade 2 (ages 4–8). The adaptive difficulty means it grows with your child.',
               },
               {
-                q: 'Can I use it on any device?',
-                a: 'Yes — Kiddy works on phones, tablets, and desktops. Progress syncs across devices when signed in.',
+                q: 'Will my child\'s progress be saved?',
+                a: 'Yes. All progress, badges, and streaks are saved automatically when signed in with Google.',
               },
             ].map(({ q, a }) => (
               <div key={q} className="bg-[#0d0d0d] border border-[#1a1a1a] rounded-[16px] p-5">
@@ -183,16 +275,35 @@ export default function UpgradePage() {
         className="py-12 px-6 text-center"
         style={{ background: 'linear-gradient(180deg, #001a4d 0%, #003791 100%)' }}
       >
-        <p className="text-white/70 text-sm mb-6">Start with free games. Upgrade when you see the value.</p>
+        <p className="text-white/70 text-sm mb-6">
+          Real learning. Measurable results. 15 minutes a day.
+        </p>
         <div className="flex flex-wrap gap-4 justify-center">
-          <Link href="/" className="ps-btn bg-white text-[#003791] font-bold hover:bg-yellow-50">
+          {!user ? (
+            <AuthButton />
+          ) : !isPremium && !isTrial ? (
+            <button
+              onClick={handleStartTrial}
+              disabled={trialLoading}
+              className="ps-btn bg-white text-[#003791] font-bold hover:bg-yellow-50"
+            >
+              {trialLoading ? 'Activating...' : 'Start Free Trial →'}
+            </button>
+          ) : isTrial ? (
+            <Link href="/parent" className="ps-btn bg-white text-[#003791] font-bold hover:bg-yellow-50">
+              Dashboard ({trialDaysLeft}d left) →
+            </Link>
+          ) : (
+            <Link href="/parent" className="ps-btn bg-white text-[#003791] font-bold hover:bg-yellow-50">
+              View Dashboard →
+            </Link>
+          )}
+          <Link href="/" className="ps-btn bg-transparent border border-white/40 text-white hover:bg-white/10">
             Explore Free Games
-          </Link>
-          <Link href="/parent" className="ps-btn bg-transparent border border-white/40 text-white hover:bg-white/10">
-            View Parent Dashboard
           </Link>
         </div>
       </footer>
     </div>
   );
 }
+

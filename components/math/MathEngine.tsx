@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import VisualBlocks from './VisualBlocks';
 import ColumnGrid from './ColumnGrid';
 import WordProblem from './WordProblem';
 import { DifficultyLevel, Operation, ProblemState } from './types';
 import { useSubjectProgress } from '../useSubjectProgress';
+import { useRewards } from '../useRewards';
 
 const LEVEL_LABELS: Record<DifficultyLevel, string> = {
   1: '1-Digit',
@@ -50,10 +51,22 @@ function generateProblemForLevel(level: DifficultyLevel): ProblemState {
 
 export default function MathEngine() {
   const { progress, recordSolve } = useSubjectProgress('mathematics');
+  const { logSession } = useRewards();
+  const sessionStart = useRef(Date.now());
   const [problem, setProblem] = useState<ProblemState | null>(null);
   const [sessionStats, setSessionStats] = useState({ correct: 0, total: 0 });
   // key forces sub-component remount when a new problem is generated
   const [problemKey, setProblemKey] = useState(0);
+
+  // Log session duration on unmount
+  useEffect(() => {
+    sessionStart.current = Date.now();
+    return () => {
+      const mins = Math.max(1, Math.round((Date.now() - sessionStart.current) / 60000));
+      logSession({ subject: 'mathematics', durationMinutes: mins, completedModules: 1 });
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const level = progress.difficulty_level as DifficultyLevel;
 

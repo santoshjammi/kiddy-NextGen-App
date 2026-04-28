@@ -7,6 +7,7 @@ import { useFirebase } from '../../components/FirebaseProvider';
 import AuthButton from '../../components/AuthButton';
 import type { SubjectProgress } from '../../components/useSubjectProgress';
 import { useRewards } from '../../components/useRewards';
+import { getWeakAreaRoute } from '../../components/useWeakAreaRoute';
 
 interface SessionStats {
   todayMinutes: number;
@@ -22,9 +23,11 @@ const SUBJECTS: {
   route: string;
   color: string;
 }[] = [
-  { key: 'carry-borrow', label: 'Carry & Borrow',  emoji: '📊', route: '/carry-borrow', color: '#0070cc' },
-  { key: 'mathematics',  label: 'Math Engine',      emoji: '🧮', route: '/math',         color: '#7c3aed' },
-  { key: 'english',      label: 'Word Builder',     emoji: '📝', route: '/english',      color: '#0891b2' },
+  { key: 'carry-borrow',    label: 'Carry & Borrow',      emoji: '📊', route: '/carry-borrow',        color: '#0070cc' },
+  { key: 'mathematics',     label: 'Math Engine',          emoji: '🧮', route: '/math',                color: '#7c3aed' },
+  { key: 'english',         label: 'Word Builder',         emoji: '📝', route: '/english',             color: '#0891b2' },
+  { key: 'multiplication',  label: 'Multiplication Race',  emoji: '🏎️', route: '/multiplication-race', color: '#f59e0b' },
+  { key: 'division',        label: 'Division Splitter',    emoji: '➗', route: '/division-splitter',   color: '#7c3aed' },
 ];
 
 const LEVEL_LABELS: Record<number, string> = {
@@ -58,7 +61,7 @@ function formatDate(iso: string): string {
 
 // ── Main component ────────────────────────────────────────────────
 export default function ParentDashboard() {
-  const { db, user, loading: authLoading, isPremium } = useFirebase();
+  const { db, user, loading: authLoading, isPremium, isTrial, trialDaysLeft } = useFirebase();
   const [progressMap, setProgressMap] = useState<Record<string, SubjectProgress>>({});
   const [dataLoading, setDataLoading] = useState(true);
   const [sessionStats, setSessionStats] = useState<SessionStats>({ todayMinutes: 0, weekMinutes: 0, weekDays: 0 });
@@ -167,15 +170,29 @@ export default function ParentDashboard() {
   }
 
   const uniqueStruggles = [...new Set(allStruggles.map(s => s.tag))];
+
+  // Adaptive routing — find the best remediation route from struggle tags
+  const weakAreaRec = getWeakAreaRoute(uniqueStruggles);
+  const adaptiveRoute = weakAreaRec.route;
+  const adaptiveLabel = weakAreaRec.label;
+  const adaptiveEmoji = weakAreaRec.emoji;
+
   const recommendedKey = weakKeys[0] ?? lowestKey;
   const recommendedSubject = SUBJECTS.find(s => s.key === recommendedKey)!;
   const recommendedProgress = progressMap[recommendedKey] ?? defaultProgress(recommendedKey);
   const recommendation =
     uniqueStruggles.length > 0
-      ? `Work on "${formatStruggle(uniqueStruggles[0])}" in ${allStruggles.find(s => s.tag === uniqueStruggles[0])?.subject}`
+      ? `Your child is having difficulty with ${formatStruggle(uniqueStruggles[0])}. Practice ${adaptiveLabel} to improve.`
       : strengthKeys.length === SUBJECTS.length
       ? 'Excellent progress! Advance to the next level in any subject'
       : `Build mastery in ${recommendedSubject.label} — currently at Level ${recommendedProgress.difficulty_level}`;
+
+  // Today's Learning Plan — 3 subjects ordered by lowest mastery
+  const planItems = [...SUBJECTS]
+    .map(s => ({ ...s, mastery: (progressMap[s.key] ?? defaultProgress(s.key)).mastery_score }))
+    .sort((a, b) => a.mastery - b.mastery)
+    .slice(0, 3);
+  const PLAN_DURATIONS = [10, 5, 5];
 
   return (
     <div className="min-h-screen bg-[#f5f7fa]">
@@ -192,6 +209,14 @@ export default function ParentDashboard() {
           </div>
           <AuthButton />
         </div>
+        {isTrial && (
+          <div className="bg-[#0070cc]/20 border-t border-[#0070cc]/30 text-center py-2 px-6">
+            <p className="text-[#60a5fa] text-xs font-semibold">
+              🎉 Trial active — <span className="font-bold">{trialDaysLeft} day{trialDaysLeft !== 1 ? 's' : ''}</span> remaining ·{' '}
+              <Link href="/upgrade" className="underline hover:text-white">Upgrade to Premium</Link>
+            </p>
+          </div>
+        )}
       </header>
 
       <div className="max-w-5xl mx-auto px-6 py-10 flex flex-col gap-8">
@@ -217,18 +242,51 @@ export default function ParentDashboard() {
           ))}
         </div>
 
-        {/* ── Recommended today — CTA (PREMIUM GATED) ──────────────────────── */}
-        <div className="relative">
+        {/* ── Weekly Progress Story ─────────────────────── */}
+        <div
+          className="bg-white rounded-[20px] p-6"
+          style={{ boxShadow: 'rgba(0,0,0,0.06) 0 3px 8px 0' }}
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-2xl">📖</span>
+            <h2 className="text-[20px] font-semibold text-black">This Week</h2>
+          </div>
+          <div className="flex flex-col gap-2.5">
+            <p className="text-[#333] text-sm leading-relaxed">
+              {sessionStats.weekMinutes > 0
+                ? `Your child practiced ${sessionStats.weekMinutes} minute${sessionStats.weekMinutes !== 1 ? 's' : ''} across ${sessionStats.weekDays} day${sessionStats.weekDays !== 1 ? 's' : ''} this week.`
+                : 'No practice sessions logged this week yet. Start a 10-minute session today!'}
+            </p>
+            {strengthKeys.length > 0 && (
+              <p className="text-green-700 text-sm">
+                ✅ Showing strong mastery in: <span className="font-semibold">{strengthKeys.map(k => SUBJECTS.find(s => s.key === k)!.label).join(', ')}</span>
+              </p>
+            )}
+            {uniqueStruggles.length > 0 && (
+              <p className="text-orange-700 text-sm">
+                📌 <span className="font-semibold">{formatStruggle(uniqueStruggles[0])}</span> needs review.
+                {uniqueStruggles.length > 1 ? ` ${uniqueStruggles.length - 1} more area${uniqueStruggles.length > 2 ? 's' : ''} flagged.` : ''}
+              </p>
+            )}
+            {totalProblems > 0 && (
+              <p className="text-[#6b6b6b] text-sm">
+                {totalProblems.toLocaleString()} total problems solved since joining.
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* ── Recommended today — CTA (PREMIUM GATED) ──────────────────────── */}        <div className="relative">
           <div className={`bg-[#0070cc] rounded-[20px] p-6 md:p-8 text-white flex flex-col md:flex-row md:items-center gap-5 ${!isPremium ? 'blur-[3px] pointer-events-none select-none' : ''}`}>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-2xl">🎯</span>
+                <span className="text-2xl">{uniqueStruggles.length > 0 ? adaptiveEmoji : '🎯'}</span>
                 <h2 className="text-[22px] font-semibold">Recommended Today</h2>
               </div>
               <p className="text-white/80 text-sm leading-relaxed">{recommendation}</p>
             </div>
             <Link
-              href={recommendedSubject.route}
+              href={uniqueStruggles.length > 0 ? adaptiveRoute : recommendedSubject.route}
               className="inline-block bg-white text-[#0070cc] font-semibold px-8 py-3 rounded-full text-sm hover:bg-blue-50 transition-colors whitespace-nowrap"
             >
               Start Practice →
@@ -249,7 +307,7 @@ export default function ParentDashboard() {
         {/* ── Subject progress cards ───────────────────────── */}
         <div>
           <h2 className="text-[24px] font-light text-black mb-5">Subject Progress</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {SUBJECTS.map(({ key, label, emoji, route, color }) => {
               const p = progressMap[key] ?? defaultProgress(key);
               const started = p.total_problems_solved > 0;
@@ -325,19 +383,26 @@ export default function ParentDashboard() {
                 </p>
               </div>
             ) : (
-              <div className="flex flex-wrap gap-2">
-                {uniqueStruggles.map(tag => {
-                  const subjectLabel = allStruggles.find(s => s.tag === tag)?.subject ?? '';
-                  return (
-                    <span
-                      key={tag}
-                      className="bg-red-50 text-red-700 border border-red-200 px-3 py-1.5 rounded-full text-sm flex items-center gap-1.5"
-                    >
-                      ⚡ {formatStruggle(tag)}
-                      <span className="text-red-400 text-xs">({subjectLabel})</span>
-                    </span>
-                  );
-                })}
+              <div className="flex flex-col gap-4">
+                <p className="text-[#444] text-sm leading-relaxed">
+                  Your child is having difficulty with{' '}
+                  <span className="font-semibold text-black">{formatStruggle(uniqueStruggles[0])}</span>.
+                  Daily guided practice helps build confidence and speed in this area.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {uniqueStruggles.map(tag => {
+                    const subjectLabel = allStruggles.find(s => s.tag === tag)?.subject ?? '';
+                    return (
+                      <span
+                        key={tag}
+                        className="bg-red-50 text-red-700 border border-red-200 px-3 py-1.5 rounded-full text-sm flex items-center gap-1.5"
+                      >
+                        ⚡ {formatStruggle(tag)}
+                        <span className="text-red-400 text-xs">({subjectLabel})</span>
+                      </span>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>
@@ -350,6 +415,49 @@ export default function ParentDashboard() {
               </p>
               <Link href="/upgrade" className="bg-[#0070cc] text-white font-bold px-5 py-2 rounded-full text-sm hover:bg-[#0060bb] transition-colors">
                 Unlock Analysis →
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {/* ── Today's Learning Plan — PREMIUM GATED ─────── */}
+        <div className="relative">
+          <div
+            className={`rounded-[20px] p-6 text-white ${!isPremium ? 'blur-[3px] pointer-events-none select-none' : ''}`}
+            style={{ background: 'linear-gradient(135deg, #001a4d 0%, #003791 100%)', boxShadow: 'rgba(0,112,204,0.2) 0 8px 24px 0' }}
+          >
+            <div className="flex items-center gap-2 mb-5">
+              <span className="text-2xl">📋</span>
+              <div>
+                <h2 className="text-[20px] font-semibold">Today&apos;s Learning Plan</h2>
+                <p className="text-white/60 text-xs">Personalised 20-minute practice plan</p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-3">
+              {planItems.map((subject, i) => (
+                <Link
+                  key={subject.key}
+                  href={subject.route}
+                  className="flex items-center justify-between bg-white/10 hover:bg-white/20 transition-colors rounded-[12px] px-4 py-3"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl">{subject.emoji}</span>
+                    <span className="text-sm font-medium">{subject.label}</span>
+                  </div>
+                  <span className="text-white/70 text-xs font-semibold">{PLAN_DURATIONS[i]} min →</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+          {!isPremium && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center rounded-[20px] bg-[#001a4d]/85">
+              <span className="text-4xl mb-2">📋</span>
+              <p className="font-semibold text-white text-sm mb-1">Daily Learning Plan</p>
+              <p className="text-white/70 text-xs mb-4 text-center px-6 max-w-xs">
+                Get a personalised 20-minute daily plan — feels like having a private tutor
+              </p>
+              <Link href="/upgrade" className="bg-white text-[#003791] font-bold px-5 py-2 rounded-full text-sm hover:bg-yellow-50 transition-colors">
+                Unlock Plan →
               </Link>
             </div>
           )}

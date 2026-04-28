@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useSubjectProgress } from '../useSubjectProgress';
+import { useRewards } from '../useRewards';
 
 // ─── Word data ────────────────────────────────────────────────────────────────
 
@@ -505,11 +506,23 @@ const LEVEL_LABELS: Record<number, string> = {
 
 export default function EnglishEngine() {
   const { progress, recordSolve } = useSubjectProgress('english');
+  const { logSession } = useRewards();
+  const sessionStart = useRef(Date.now());
   const [wordIndex, setWordIndex] = useState(() => Math.floor(Math.random() * 10));
   // key forces remount of level component to reset state on new word
   const [key, setKey] = useState(0);
 
   const level = progress.difficulty_level;
+
+  // Log session duration on unmount
+  useEffect(() => {
+    sessionStart.current = Date.now();
+    return () => {
+      const mins = Math.max(1, Math.round((Date.now() - sessionStart.current) / 60000));
+      logSession({ subject: 'english', durationMinutes: mins, completedModules: 1 });
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const nextWord = useCallback(() => {
     setWordIndex((i) => (i + 1) % 10);
@@ -546,6 +559,11 @@ export default function EnglishEngine() {
           {progress.mastery_score >= 88 && level < 5 && (
             <span className="text-xs text-green-600 font-bold whitespace-nowrap">
               🚀 Level up!
+            </span>
+          )}
+          {level >= 5 && progress.mastery_score >= 88 && (
+            <span className="text-xs text-yellow-600 font-bold whitespace-nowrap">
+              🏆 Master level reached!
             </span>
           )}
         </div>

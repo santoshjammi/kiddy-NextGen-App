@@ -16,6 +16,8 @@ interface FirebaseContextType {
   user: User | null;
   loading: boolean;
   isPremium: boolean;
+  isTrial: boolean;
+  trialDaysLeft: number;
 }
 
 const FirebaseContext = createContext<FirebaseContextType>({
@@ -24,6 +26,8 @@ const FirebaseContext = createContext<FirebaseContextType>({
   user: null,
   loading: true,
   isPremium: false,
+  isTrial: false,
+  trialDaysLeft: 0,
 });
 
 export const useFirebase = () => {
@@ -42,6 +46,8 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({ children }) 
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPremium, setIsPremium] = useState(false);
+  const [isTrial, setIsTrial] = useState(false);
+  const [trialDaysLeft, setTrialDaysLeft] = useState(0);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -51,26 +57,44 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({ children }) 
     return () => unsubscribe();
   }, []);
 
-  // Keep isPremium in sync — read from users/{uid}/rewards/current which is
-  // already covered by existing security rules (instead of the root doc).
+  // Keep isPremium + trial status in sync
   useEffect(() => {
     if (!user) {
       setIsPremium(false);
+      setIsTrial(false);
+      setTrialDaysLeft(0);
       return;
     }
     const ref = doc(db, 'users', user.uid, 'rewards', 'current');
     const unsub = onSnapshot(
       ref,
       (snap) => {
-        setIsPremium(snap.exists() ? (snap.data()?.isPremium === true) : false);
+        if (!snap.exists()) {
+          setIsPremium(false);
+          setIsTrial(false);
+          setTrialDaysLeft(0);
+          return;
+        }
+        const data = snap.data();
+        const paid = data?.isPremium === true;
+        const trialEndsAt: string = data?.trialEndsAt ?? '';
+        const now = new Date();
+        const trialEnd = trialEndsAt ? new Date(trialEndsAt) : null;
+        const trialActive = !paid && trialEnd !== null && trialEnd > now;
+        const daysLeft = trialActive
+          ? Math.max(1, Math.ceil((trialEnd!.getTime() - now.getTime()) / 86400000))
+          : 0;
+        setIsPremium(paid || trialActive);
+        setIsTrial(trialActive);
+        setTrialDaysLeft(daysLeft);
       },
-      () => setIsPremium(false), // permission-denied → safe default
+      () => { setIsPremium(false); setIsTrial(false); setTrialDaysLeft(0); },
     );
     return () => unsub();
   }, [user]);
 
   return (
-    <FirebaseContext.Provider value={{ auth, db, user, loading, isPremium }}>
+    <FirebaseContext.Provider value={{ auth, db, user, loading, isPremium, isTrial, trialDaysLeft }}>
       {children}
     </FirebaseContext.Provider>
   );

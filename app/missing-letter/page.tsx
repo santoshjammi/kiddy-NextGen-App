@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import AuthButton from '../../components/AuthButton';
 import { useSubjectProgress } from '../../components/useSubjectProgress';
@@ -79,8 +79,18 @@ function getWordsForLevel(level: number): WordItem[] {
 
 export default function MissingLetterPage() {
   const { progress, recordSolve } = useSubjectProgress('missing-letter');
-  const { recordCorrect } = useRewards();
+  const { recordCorrect, logSession } = useRewards();
+  const sessionStart = useRef(Date.now());
   const level = Math.min(3, progress.difficulty_level);
+
+  useEffect(() => {
+    sessionStart.current = Date.now();
+    return () => {
+      const mins = Math.max(1, Math.round((Date.now() - sessionStart.current) / 60000));
+      logSession({ subject: 'english', durationMinutes: mins, completedModules: 1 });
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Initialise queue and choices together so choices always match queue[0]
   const [queue, setQueue] = useState<WordItem[]>(() => getWordsForLevel(1));

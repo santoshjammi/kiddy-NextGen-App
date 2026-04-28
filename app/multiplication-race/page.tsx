@@ -60,8 +60,18 @@ function setHighScore(s: number) {
 // ── Main component ────────────────────────────────────────────────
 export default function MultiplicationRacePage() {
   const { progress, recordSolve } = useSubjectProgress('multiplication');
-  const { recordCorrect } = useRewards();
+  const { recordCorrect, logSession } = useRewards();
   const level = progress.difficulty_level;
+  const sessionStart = useRef(Date.now());
+
+  useEffect(() => {
+    sessionStart.current = Date.now();
+    return () => {
+      const mins = Math.max(1, Math.round((Date.now() - sessionStart.current) / 60000));
+      logSession({ subject: 'multiplication', durationMinutes: mins, completedModules: 1 });
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   type Phase = 'idle' | 'playing' | 'summary';
   const [phase, setPhase] = useState<Phase>('idle');

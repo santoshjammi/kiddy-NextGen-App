@@ -6,6 +6,7 @@ import AuthButton from '../../components/AuthButton';
 import { useSubjectProgress } from '../../components/useSubjectProgress';
 import { useRewards } from '../../components/useRewards';
 
+
 // ── Letter data ────────────────────────────────────────────────────
 interface LetterItem {
   letter: string;
@@ -179,7 +180,17 @@ function LetterTile({ letter, onDrop, feedback, isCorrect, isSelected, disabled 
 // ── Main page ─────────────────────────────────────────────────────
 export default function LetterFishingPage() {
   const { progress, recordSolve } = useSubjectProgress('letter-fishing');
-  const { recordCorrect } = useRewards();
+  const { recordCorrect, logSession } = useRewards();
+  const sessionStart = useRef(Date.now());
+
+  useEffect(() => {
+    sessionStart.current = Date.now();
+    return () => {
+      const mins = Math.max(1, Math.round((Date.now() - sessionStart.current) / 60000));
+      logSession({ subject: 'english', durationMinutes: mins, completedModules: 1 });
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const level = Math.min(3, progress.difficulty_level);
 
   const [queue, setQueue] = useState<LetterItem[]>(() => getItemsForLevel(1));
