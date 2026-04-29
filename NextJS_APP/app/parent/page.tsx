@@ -8,6 +8,7 @@ import AuthButton from '../../components/AuthButton';
 import type { SubjectProgress } from '../../components/useSubjectProgress';
 import { useRewards } from '../../components/useRewards';
 import { getWeakAreaRoute } from '../../components/useWeakAreaRoute';
+import OnboardingModal from '../../components/OnboardingModal';
 
 interface SessionStats {
   todayMinutes: number;
@@ -67,6 +68,7 @@ export default function ParentDashboard() {
   const [sessionStats, setSessionStats] = useState<SessionStats>({ todayMinutes: 0, weekMinutes: 0, weekDays: 0 });
 
   const { rewards } = useRewards();
+  const [dataLoadedAt, setDataLoadedAt] = useState<Date | null>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -111,6 +113,7 @@ export default function ParentDashboard() {
         });
       }
       setSessionStats({ todayMinutes: todayMins, weekMinutes: weekMins, weekDays: uniqueDates.size });
+      setDataLoadedAt(new Date());
       setDataLoading(false);
     });
   }, [user, authLoading, db]);
@@ -195,8 +198,7 @@ export default function ParentDashboard() {
   const PLAN_DURATIONS = [10, 5, 5];
 
   return (
-    <div className="min-h-screen bg-[#f5f7fa]">
-
+    <div className="min-h-screen bg-[#f5f7fa]">      <OnboardingModal />
       {/* ── Header ──────────────────────────────────────────── */}
       <header className="bg-black sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -221,7 +223,33 @@ export default function ParentDashboard() {
 
       <div className="max-w-5xl mx-auto px-6 py-10 flex flex-col gap-8">
 
+        {/* ── First-session prompt (no data yet) ──────────── */}
+        {totalProblems === 0 && sessionStats.weekMinutes === 0 && (
+          <div className="bg-[#0070cc] rounded-[20px] p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-5">
+            <div className="flex-1">
+              <p className="text-white/70 text-xs uppercase tracking-wider mb-2">Welcome — let&apos;s get started</p>
+              <h2 className="text-white text-xl font-semibold mb-2">Your dashboard is ready</h2>
+              <p className="text-white/80 text-sm leading-relaxed">
+                Start a 10-minute session with any game below. Your first progress report will appear here automatically.
+              </p>
+            </div>
+            <Link
+              href="/"
+              className="inline-block bg-white text-[#0070cc] font-bold px-7 py-3 rounded-full text-sm hover:bg-blue-50 transition-colors whitespace-nowrap flex-shrink-0"
+            >
+              Pick a game →
+            </Link>
+          </div>
+        )}
+
         {/* ── Summary strip ───────────────────────────────── */}
+        <div className="flex items-center justify-between mb-[-16px]">
+          <p className="text-[#6b6b6b] text-xs">
+            {dataLoadedAt
+              ? `Updated ${dataLoadedAt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} today`
+              : 'Loading…'}
+          </p>
+        </div>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
           {[
             { label: 'Questions Answered', value: totalProblems.toLocaleString(), icon: '✅' },
@@ -343,8 +371,10 @@ export default function ParentDashboard() {
 
                   <div className="flex items-center justify-between text-xs text-[#6b6b6b]">
                     <span>{p.total_problems_solved} problems</span>
-                    {started && (
-                      <span>Last: {formatDate(p.last_played)}</span>
+                    {started ? (
+                      <span title="Last session date">Last: {formatDate(p.last_played)}</span>
+                    ) : (
+                      <span className="text-[#0070cc]">Not started</span>
                     )}
                   </div>
 

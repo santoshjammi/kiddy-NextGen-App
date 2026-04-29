@@ -265,6 +265,43 @@ export default function UpgradePage() {
         </div>
       </section>
 
+      {/* ── Social proof ─────────────────────────────────────── */}
+      <section className="py-12 px-6 border-b border-[#1a1a1a]">
+        <div className="max-w-3xl mx-auto">
+          <p className="text-[#6b6b6b] text-xs uppercase tracking-widest text-center mb-8">What parents say after 2 weeks</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              {
+                quote: 'He used to cry over carry-overs. After two weeks on Kiddy, he shows me how to solve them.',
+                name: 'Priya M.',
+                detail: 'Parent of a 6-year-old',
+              },
+              {
+                quote: 'I can finally see exactly where she needs help. The dashboard tells me more than her teacher does.',
+                name: 'Kartik R.',
+                detail: 'Parent of a 5-year-old',
+              },
+              {
+                quote: 'She asks to "do her Kiddy time" before dinner now. That is not something I expected.',
+                name: 'Sonal D.',
+                detail: 'Parent of a 5-year-old',
+              },
+            ].map(({ quote, name, detail }) => (
+              <div
+                key={name}
+                className="bg-[#0d0d0d] border border-[#1a1a1a] rounded-[20px] p-5 flex flex-col gap-3"
+              >
+                <p className="text-[#b0b0b0] text-sm leading-relaxed italic">&ldquo;{quote}&rdquo;</p>
+                <div className="mt-auto pt-2 border-t border-[#1a1a1a]">
+                  <p className="text-white text-sm font-semibold">{name}</p>
+                  <p className="text-[#6b6b6b] text-xs">{detail}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Plans comparison ─────────────────────────────────── */}
       <section className="py-16 px-6 border-b border-[#1a1a1a]">
         <div className="max-w-3xl mx-auto">
