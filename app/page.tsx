@@ -302,6 +302,22 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Trust strip ──────────────────────────────────────── */}
+      <div className="bg-[#0a0a0a] border-y border-[#1a1a1a]">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-wrap items-center justify-center gap-x-10 gap-y-2">
+          {[
+            { icon: '🔒', text: 'No ads. Ever.' },
+            { icon: '🙅', text: 'No personal data sold' },
+            { icon: '👶', text: 'Designed for ages 3–6' },
+            { icon: '✅', text: 'Free for every child' },
+          ].map(({ icon, text }) => (
+            <span key={text} className="text-[#6b6b6b] text-sm flex items-center gap-1.5">
+              <span>{icon}</span>{text}
+            </span>
+          ))}
+        </div>
+      </div>
+
       {/* ── Games Grid ───────────────────────────────────────── */}
       <section id="games" className="bg-[#f5f7fa] py-20">
         <div className="max-w-7xl mx-auto px-6">
