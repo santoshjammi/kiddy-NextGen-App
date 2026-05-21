@@ -1,0 +1,495 @@
+project:
+  name: Kiddy Animation Engine
+  short_name: KAE
+  version: 1.0
+  status: ready_for_antigravity
+  owner: SANTOSH JAMMI
+
+vision:
+  statement: >
+    Build a reusable Remotion animation infrastructure for Kiddy
+    that powers learning experiences, emotional guidance,
+    rewards, transitions, and game interactions.
+
+  philosophy:
+    - animation_is_instruction
+    - emotion_drives_learning
+    - scenes_over_page_animations
+    - events_over_manual_effects
+    - reusable_over_custom
+
+target_users:
+
+  primary:
+    age: "4-6"
+
+  personas:
+    - child
+    - parent
+
+constraints:
+
+  child_experience:
+    - one_task_per_screen
+    - giant_interaction_targets
+    - audio_first
+    - no_negative_language
+    - positive_reinforcement
+
+  avoid:
+    - dense_screens
+    - harsh_red_feedback
+    - long_animations
+    - duplicated_animation_logic
+
+architecture:
+
+  layers:
+
+    app_shell:
+
+      purpose: parent_trust
+
+      components:
+        - homepage
+        - dashboard
+        - upgrade
+        - learning_path
+        - profile
+
+      design_system:
+        source: playstation_shell
+
+    learning_layer:
+
+      purpose: child_engagement
+
+      components:
+        - math_games
+        - english_games
+        - rewards
+        - practice
+
+      design_system:
+        source: game_first
+
+    animation_engine:
+
+      purpose: centralized_remotion_infrastructure
+
+      modules:
+
+        scene_registry:
+          role: single_source_of_truth
+
+        event_bus:
+          role: trigger_animation_state
+
+        character_system:
+          role: mascot_management
+
+        effects_system:
+          role: reusable_feedback
+
+        transition_system:
+          role: learning_flow
+
+        audio_engine:
+          role: narration_sync
+
+folder_structure:
+
+  remotion:
+
+    characters:
+
+      bunny:
+
+      owl:
+
+      robot:
+
+      dino:
+
+    scenes:
+
+      IntroScene:
+
+      QuestionScene:
+
+      CorrectScene:
+
+      WrongScene:
+
+      RewardScene:
+
+      TransitionScene:
+
+      BadgeUnlockScene:
+
+    templates:
+
+      LetterFishingTemplate:
+
+      MissingLetterTemplate:
+
+      CarryBorrowTemplate:
+
+      MultiplicationTemplate:
+
+    effects:
+
+      stars:
+
+      confetti:
+
+      shake:
+
+      glow:
+
+      sparkles:
+
+      reward_coins:
+
+    stories:
+
+      ocean:
+
+      jungle:
+
+      space:
+
+      farm:
+
+    audio:
+
+      voice:
+
+      effects:
+
+      music:
+
+scene_registry:
+
+  file: remotion/sceneRegistry.ts
+
+  scenes:
+
+    intro:
+      component: IntroScene
+      priority: P0
+
+    question:
+      component: QuestionScene
+      priority: P0
+
+    correct_answer:
+      component: CorrectScene
+      priority: P0
+
+    wrong_answer:
+      component: WrongScene
+      priority: P0
+
+    reward_unlock:
+      component: RewardScene
+      priority: P0
+
+    badge_unlock:
+      component: BadgeUnlockScene
+      priority: P1
+
+events:
+
+  transport: EventBus
+
+  schema:
+
+    GAME_START:
+
+    QUESTION_START:
+
+    CORRECT_ANSWER:
+
+    WRONG_ANSWER:
+
+    HINT_TRIGGER:
+
+    LEVEL_COMPLETE:
+
+    STREAK_REWARD:
+
+    BADGE_UNLOCK:
+
+    SESSION_COMPLETE:
+
+event_payload:
+
+  subject:
+    enum:
+      - math
+      - english
+
+  world:
+    enum:
+      - ocean
+      - farm
+      - jungle
+      - space
+
+  mascot:
+    enum:
+      - bunny
+      - owl
+      - robot
+      - dino
+
+  payload:
+
+    difficulty: number
+
+    mastery: number
+
+    points: number
+
+    rewards: array
+
+example_event:
+
+  event: CORRECT_ANSWER
+
+  subject: english
+
+  world: ocean
+
+  mascot: bunny
+
+  payload:
+
+    points: 10
+
+game_rules:
+
+  games_must_not:
+
+    - trigger_animations_directly
+    - import_scene_components
+    - duplicate_effects
+    - create_custom_confetti
+
+  games_must:
+
+    - emit_events
+    - use_GameWrapper
+    - use_scene_registry
+
+game_wrapper:
+
+  purpose: standard_game_container
+
+  responsibilities:
+
+    - intro_scene
+    - question_rendering
+    - reward_handling
+    - feedback
+    - firestore_updates
+    - animation_dispatch
+
+  structure: |
+
+    <GameWrapper>
+
+      <IntroScene/>
+
+      <Question/>
+
+      <FeedbackScene/>
+
+      <RewardScene/>
+
+    </GameWrapper>
+
+screen_flows:
+
+  letter_fishing:
+
+    world: ocean
+
+    sequence:
+
+      - bunny_intro
+      - narration
+      - fish_animation
+      - drag_letter
+      - validate
+      - feedback
+      - reward
+      - next_question
+
+    session_target_seconds: 45
+
+  missing_letter:
+
+    sequence:
+
+      - intro
+      - word_prompt
+      - choose_letter
+      - validation
+      - reward
+
+  carry_borrow:
+
+    sequence:
+
+      - tutorial
+      - question
+      - carry_input
+      - validation
+      - reward
+      - mastery_update
+
+mascots:
+
+  primary:
+
+    bunny:
+
+      personality:
+
+        - playful
+        - energetic
+        - curious
+        - encouraging
+
+      voice_lines:
+
+        - Great job
+        - Lets count together
+        - Wow
+        - Amazing
+
+  support:
+
+    owl:
+      role: hint_provider
+
+    robot:
+      role: guide
+
+    dino:
+      role: adventure_character
+
+assets:
+
+  bunny:
+
+    required:
+
+      - happy.svg
+      - excited.svg
+      - thinking.svg
+      - sad.svg
+      - wave.svg
+      - jump.svg
+
+  backgrounds:
+
+    required:
+
+      - ocean.png
+      - farm.png
+      - jungle.png
+      - space.png
+
+  sounds:
+
+    required:
+
+      - great-job.mp3
+      - wow.mp3
+      - amazing.mp3
+      - try-again.mp3
+
+  effects:
+
+    required:
+
+      - stars
+      - confetti
+      - reward_coins
+
+timing:
+
+  intro_seconds: 2
+
+  question_seconds: 5
+
+  correct_feedback_seconds: 1
+
+  wrong_feedback_seconds: 1
+
+  reward_seconds: 2
+
+implementation:
+
+  sprint_1:
+
+    goal: infrastructure
+
+    tasks:
+
+      - create_remotion_structure
+      - create_scene_registry
+      - create_GameWrapper
+      - create_Bunny
+      - create_audio_engine
+
+  sprint_2:
+
+    goal: core_scenes
+
+    tasks:
+
+      - IntroScene
+      - CorrectScene
+      - WrongScene
+      - RewardScene
+
+  sprint_3:
+
+    goal: first_integrations
+
+    tasks:
+
+      - LetterFishing
+      - MissingLetter
+
+  sprint_4:
+
+    goal: math_integrations
+
+    tasks:
+
+      - CarryBorrow
+      - MultiplicationRace
+      - DivisionSplitter
+
+success_criteria:
+
+  child:
+
+    - completes_session
+    - engaged_for_15_minutes
+    - low_dropoff
+
+  parent:
+
+    - understands_progress
+    - trusts_platform
+
+  engineering:
+
+    - reusable_scene_system
+    - zero_duplicate_animation_logic

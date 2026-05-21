@@ -1,0 +1,149 @@
+kiddy_motion_language:
+  version: 1.0
+  audience:
+    age: "4-6"
+
+  philosophy:
+    - predictable_motion
+    - emotional_safety
+    - joyful_feedback
+    - giant_visual_focus
+    - low_cognitive_load
+
+  global_rules:
+    max_objects_per_screen: 5
+    max_simultaneous_animations: 3
+    max_voice_lines_before_interaction: 1
+    max_animation_duration_seconds: 2
+    interaction_delay_ms: 300
+    avoid:
+      - flashing_effects
+      - chaotic_particles
+      - dense_ui
+      - long_text
+      - overlapping_audio
+
+  mascot_behavior:
+    bunny:
+      idle:
+        sequence:
+          - breathe
+          - blink
+          - ear_wiggle
+        frequency_seconds: 4
+      attention_gain:
+        sequence:
+          - hop
+          - wave
+          - smile
+      encouragement:
+        sequence:
+          - jump
+          - stars
+          - voice
+      wrong_answer:
+        sequence:
+          - thinking_face
+          - head_tilt
+          - helper_glow
+      never:
+        - cry
+        - frown_extremely
+        - show_failure
+
+  motion_primitives:
+    success:
+      sequence:
+        - scale_1_05
+        - bounce
+        - stars
+        - reward_glow
+        - mascot_jump
+      duration: 1000
+    retry:
+      sequence:
+        - gentle_shake
+        - thinking
+        - hint_glow
+      duration: 1000
+    level_complete:
+      sequence:
+        - confetti
+        - badge
+        - mascot_dance
+        - reward_coins
+      duration: 2000
+    transition:
+      sequence:
+        - cloud_wipe
+        - rainbow_slide
+      duration: 800
+
+  world_rules:
+    ocean:
+      ambient:
+        - floating_bubbles
+        - slow_waves
+        - fish_swim
+    jungle:
+      ambient:
+        - leaves
+        - butterflies
+        - birds
+    farm:
+      ambient:
+        - clouds
+        - grass_motion
+        - birds
+    space:
+      ambient:
+        - stars
+        - floating_planets
+
+  ui_consistency:
+    buttons:
+      shape: pill
+      size: giant
+      minimum_height: 72px
+      interaction:
+        - bounce
+      icons_required: true
+    cards:
+      radius: extra_large
+      style: soft
+    text:
+      max_words_per_instruction: 6
+      narration_required: true
+      uppercase: false
+
+  scene_rules:
+    IntroScene:
+      structure:
+        - mascot_entry
+        - greeting
+        - one_instruction
+        - interaction
+    CorrectScene:
+      structure:
+        - stars
+        - bounce
+        - reward
+        - mascot_celebrate
+    WrongScene:
+      structure:
+        - helper_animation
+        - hint
+        - retry
+    RewardScene:
+      structure:
+        - badge
+        - coins
+        - celebration
+  
+  acceptance:
+    all_games_must:
+      - feel_like_same_world
+      - use_same_feedback_patterns
+      - use_same_audio_language
+      - use_same_mascot_logic
+      - use_same_button_behaviors
