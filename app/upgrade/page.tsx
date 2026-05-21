@@ -137,7 +137,10 @@ export default function UpgradePage() {
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="ps-btn ps-btn-sm ps-btn-ghost-dark">← Back</Link>
           <h1 className="text-[20px] font-light text-white">Unlock Premium</h1>
-          <AuthButton />
+          <div className="flex items-center gap-3">
+            <Link href="/community" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors hidden md:block">Community</Link>
+            <AuthButton />
+          </div>
         </div>
       </header>
 

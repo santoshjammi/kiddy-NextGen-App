@@ -279,6 +279,7 @@ export default function Home() {
           <nav className="hidden md:flex items-center gap-8">
             <Link href="/learning-path" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">Learning Path</Link>
             <Link href="/rewards" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">Rewards</Link>
+            <Link href="/community" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">Community</Link>
             <Link href="/parent" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">Dashboard</Link>
             <Link href="/upgrade" className="text-[#0070cc] text-sm font-semibold hover:text-[#1883fd] transition-colors">⭐ Upgrade</Link>
             <Link href="/about" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">About</Link>

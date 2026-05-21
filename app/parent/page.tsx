@@ -209,7 +209,10 @@ export default function ParentDashboard() {
               Progress for {user?.displayName ?? user?.email ?? 'your learner'}
             </p>
           </div>
-          <AuthButton />
+          <div className="flex items-center gap-3">
+            <Link href="/community" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors hidden md:block">Community</Link>
+            <AuthButton />
+          </div>
         </div>
         {isTrial && (
           <div className="bg-[#0070cc]/20 border-t border-[#0070cc]/30 text-center py-2 px-6">
