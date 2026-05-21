@@ -33,6 +33,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Establish early connections to Firebase endpoints */}
+        <link rel="preconnect" href="https://firestore.googleapis.com" />
+        <link rel="preconnect" href="https://identitytoolkit.googleapis.com" />
+        <link rel="preconnect" href="https://securetoken.googleapis.com" />
+        <link rel="dns-prefetch" href="https://kiddy-7badf.firebaseapp.com" />
+      </head>
       <body className={`${inter.variable} font-inter antialiased`}>
         <FirebaseProvider>
           {children}

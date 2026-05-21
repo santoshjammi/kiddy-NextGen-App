@@ -1,7 +1,11 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore } from "firebase/firestore";
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+} from "firebase/firestore";
 // analytics is lazily initialized below
 import { getAuth } from "firebase/auth";
 
@@ -27,8 +31,16 @@ if (typeof window !== 'undefined') {
   );
 }
 
-// Initialize Firestore
-export const db = getFirestore(app);
+// Initialize Firestore with IndexedDB persistent cache.
+// On revisits Firestore returns cached data instantly (<50 ms),
+// then quietly syncs any updates from the server in the background.
+export const db = typeof window !== 'undefined'
+  ? initializeFirestore(app, {
+      localCache: persistentLocalCache({
+        tabManager: persistentMultipleTabManager(),
+      }),
+    })
+  : initializeFirestore(app, {});
 
 // Initialize Auth
 export const auth = getAuth(app);

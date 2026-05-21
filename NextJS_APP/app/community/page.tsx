@@ -230,10 +230,28 @@ export default function CommunityPage() {
           ))}
         </div>
 
-        {/* ── Loading ─────────────────────────────────────── */}
+        {/* ── Skeleton loading ─────────────────────────────── */}
         {loading && (
-          <div className="flex justify-center py-16">
-            <div className="w-8 h-8 border-2 border-[#0070cc] border-t-transparent rounded-full animate-spin" />
+          <div className="flex flex-col gap-4">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="bg-white rounded-[24px] p-6 animate-pulse"
+                style={{ boxShadow: 'rgba(0,0,0,0.07) 0 4px 8px 0' }}
+              >
+                <div className="flex gap-2 mb-3">
+                  <div className="h-4 w-20 bg-[#e8e8e8] rounded-full" />
+                  <div className="h-4 w-16 bg-[#e8e8e8] rounded-full" />
+                </div>
+                <div className="h-5 w-3/4 bg-[#e8e8e8] rounded-lg mb-2" />
+                <div className="h-4 w-full bg-[#f3f3f3] rounded-lg mb-1" />
+                <div className="h-4 w-2/3 bg-[#f3f3f3] rounded-lg mb-5" />
+                <div className="flex justify-between pt-3 border-t border-[#f3f3f3]">
+                  <div className="h-3 w-24 bg-[#e8e8e8] rounded-full" />
+                  <div className="h-3 w-12 bg-[#e8e8e8] rounded-full" />
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
