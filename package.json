@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "node .next/standalone/server.js",
+    "start": "next start",
     "lint": "next lint",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
@@ -16,7 +16,7 @@
     "@prisma/client": "^4.16.0",
     "@remotion/player": "^4.0.464",
     "firebase": "^12.8.0",
-    "next": "^15.1.3",
+    "next": "^16.2.6",
     "next-auth": "^4.22.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

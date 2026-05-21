@@ -1,5 +1,20 @@
-// server.js — Hostinger entry point.
-// Delegates to the standalone Next.js server built by `npm run build`.
-// Hostinger runs: npm install && npm run build, then node server.js
-require('./.next/standalone/server.js');
+// server.js — Next.js custom server for Hostinger.
+// Hostinger may run `node server.js` as the entry point.
+// This delegates all routing to Next.js so every pre-rendered page is served.
+const { createServer } = require('http');
+const { parse } = require('url');
+const next = require('next');
+
+const dev = process.env.NODE_ENV !== 'production';
+const port = parseInt(process.env.PORT || '3000', 10);
+const app = next({ dev });
+const handle = app.getRequestHandler();
+
+app.prepare().then(() => {
+  createServer((req, res) => {
+    handle(req, res, parse(req.url, true));
+  }).listen(port, '0.0.0.0', () => {
+    console.log(`> Kiddy ready on port ${port}`);
+  });
+});
 
