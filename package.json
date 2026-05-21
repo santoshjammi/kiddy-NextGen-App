@@ -6,7 +6,6 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "start:static": "node server.js",
     "lint": "next lint",
     "test": "playwright test",
     "test:ui": "playwright test --ui",

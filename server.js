@@ -1,6 +1,7 @@
-// server.js — Hostinger Node.js entry point
-// Serves the Next.js static export from the `out/` directory.
-// Hostinger runs: npm install && node server.js (or npm start)
+// server.js — static file server for the Next.js `output: 'export'` build.
+// NOT USED in production. Production runs `next start` (npm start).
+// To use this locally: npm run build (with output:'export' in next.config.mjs),
+// then node server.js. Only relevant if switching back to static export mode.
 
 const http = require('http');
 const fs = require('fs');
