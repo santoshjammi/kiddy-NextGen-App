@@ -8,7 +8,7 @@
 
 # next.js
 /.next/
-# /out/ is intentionally tracked — Hostinger Node.js reads it from the repo
+/out/
 
 # production
 /build
