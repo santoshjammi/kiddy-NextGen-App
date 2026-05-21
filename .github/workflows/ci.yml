@@ -1,0 +1,53 @@
+name: CI
+
+# Runs on every push and pull-request that touches the Next.js app.
+# Catches lint errors and broken builds before they reach main.
+
+on:
+  push:
+    paths:
+      - "NextJS_APP/**"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    paths:
+      - "NextJS_APP/**"
+      - ".github/workflows/ci.yml"
+
+jobs:
+  build:
+    name: Lint & Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: NextJS_APP
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: NextJS_APP/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+        env:
+          # Provide a placeholder so the build does not fail on missing env var.
+          # The real value is only needed at deploy time.
+          NEXT_PUBLIC_FOUNDER_EMAIL: ${{ secrets.NEXT_PUBLIC_FOUNDER_EMAIL }}
+
+      - name: Upload static export (for inspection)
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-export-${{ github.sha }}
+          path: NextJS_APP/out/
+          retention-days: 3
