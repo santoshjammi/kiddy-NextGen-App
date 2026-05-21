@@ -15,24 +15,69 @@ interface AppCardProps {
 
 function AppCard({ emoji, title, description, link, progress, total }: AppCardProps) {
   return (
-    <Link href={link} className="block">
-      <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8 text-center shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border-3 border-transparent hover:border-teal-400 flex flex-col justify-between min-h-[320px] overflow-hidden relative">
-        <div className="text-6xl mb-6 animate-bounce-custom">{emoji}</div>
-        <div className="flex-grow">
-          <h2 className="text-3xl font-semibold text-transparent bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text mb-3 leading-tight">
+    <Link href={link} className="block group">
+      <div
+        className="bg-white rounded-[24px] p-8 flex flex-col justify-between min-h-[280px] overflow-hidden
+                   transition-transform duration-200 group-hover:scale-[1.02]"
+        style={{ boxShadow: 'rgba(0,0,0,0.08) 0 5px 9px 0' }}
+      >
+        <div>
+          <div className="text-4xl mb-4">{emoji}</div>
+          <h2 className="text-[22px] font-light text-black leading-snug tracking-[0.1px] mb-2">
             {title}
           </h2>
-          <p className="text-gray-600 mb-6 leading-relaxed flex-grow">{description}</p>
+          <p className="text-[#6b6b6b] text-sm leading-relaxed">{description}</p>
         </div>
-        <div className="mb-6">
-          <span className="text-sm text-gray-500 block mb-2">Learning Progress</span>
-          <div className="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-teal-400 to-sky-400 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
+        <div className="mt-6">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-xs text-[#6b6b6b] font-medium">{total}</span>
+            <span className="text-xs text-[#0070cc] font-semibold">{progress}%</span>
+          </div>
+          <div className="ps-progress-track mb-5">
+            <div className="ps-progress-fill" style={{ width: `${progress}%` }} />
+          </div>
+          <div className="ps-btn ps-btn-sm w-full justify-center">
+            Start Learning
           </div>
         </div>
-        <button className="bg-gradient-to-r from-red-400 to-teal-400 text-white border-none py-4 px-8 rounded-full text-lg font-semibold cursor-pointer transition-all duration-300 hover:scale-105 shadow-lg uppercase tracking-wider">
-          Start Learning
-        </button>
+      </div>
+    </Link>
+  );
+}
+
+interface NewGameCardProps {
+  emoji: string;
+  title: string;
+  description: string;
+  link: string;
+  badge: string;
+}
+
+function NewGameCard({ emoji, title, description, link, badge }: NewGameCardProps) {
+  return (
+    <Link href={link} className="block group">
+      <div
+        className="bg-white rounded-[24px] p-7 flex flex-col justify-between min-h-[220px] overflow-hidden
+                   transition-transform duration-200 group-hover:scale-[1.02]"
+        style={{ boxShadow: 'rgba(0,0,0,0.08) 0 5px 9px 0' }}
+      >
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-4xl">{emoji}</span>
+            <span className="text-[10px] font-semibold uppercase tracking-wider bg-[#f0f7ff] text-[#0070cc] px-2.5 py-1 rounded-full">
+              {badge}
+            </span>
+          </div>
+          <h2 className="text-[20px] font-light text-black leading-snug tracking-[0.1px] mb-2">
+            {title}
+          </h2>
+          <p className="text-[#6b6b6b] text-sm leading-relaxed">{description}</p>
+        </div>
+        <div className="mt-5">
+          <div className="ps-btn ps-btn-sm w-full justify-center">
+            Play Now
+          </div>
+        </div>
       </div>
     </Link>
   );
@@ -94,81 +139,286 @@ export default function Home() {
       progress: progressData.colors,
       total: `${Math.round(progressData.colors * 12 / 100)}/12 Colors`,
     },
+    {
+      emoji: '🧮',
+      title: 'Math Engine',
+      description: 'Adaptive mathematics from single digits to 5-digit problems. Visual blocks, column grids, and word problems — levels up as you master each stage!',
+      link: '/math',
+      progress: 0,
+      total: 'Levels 1–5',
+    },
+    {
+      emoji: '✍️',
+      title: 'Word Builder',
+      description: 'Grow your vocabulary from 2-letter sight words to 5-letter Wordle challenges. Letter blocks, missing vowels, scrambles, and more!',
+      link: '/english',
+      progress: 0,
+      total: 'Levels 1–4',
+    },
+    {
+      emoji: '📊',
+      title: 'Carry & Borrow Grid',
+      description: 'Master column addition with carry and subtraction with borrow — the #1 math skill parents instantly understand. 5 progression levels!',
+      link: '/carry-borrow',
+      progress: 0,
+      total: 'Levels 1–5',
+    },
+  ];
+
+  const newGames = [
+    {
+      emoji: '🃏',
+      title: 'Memory Match',
+      description: 'Flip cards and find matching emoji pairs. Train your memory with this classic concentration game!',
+      link: '/memory-match',
+      badge: 'Memory',
+    },
+    {
+      emoji: '🔡',
+      title: 'Spelling Builder',
+      description: 'See a picture, click the shuffled letters in the right order to spell the word. 15 words to master!',
+      link: '/spelling',
+      badge: 'Spelling',
+    },
+    {
+      emoji: '🎵',
+      title: 'Rhyming Words',
+      description: 'Which word rhymes? Pick the correct rhyme from three choices. 15 fun rhyming pairs!',
+      link: '/rhyming',
+      badge: 'Language',
+    },
+    {
+      emoji: '🧩',
+      title: 'Pattern Recognition',
+      description: 'Complete the emoji pattern — what comes next? Develop logical thinking with 15 patterns!',
+      link: '/patterns',
+      badge: 'Logic',
+    },
+    {
+      emoji: '📖',
+      title: 'Sight Words',
+      description: 'Flash card practice for 90+ high-frequency Dolch words. Track which words you know!',
+      link: '/sight-words',
+      badge: 'Reading',
+    },
+    {
+      emoji: '🔢',
+      title: 'Counting Puzzle',
+      description: 'Count the objects on screen and tap the correct number. With streak tracking and animations!',
+      link: '/counting',
+      badge: 'Math',
+    },
+    {
+      emoji: '🦁',
+      title: 'Animal Sounds',
+      description: 'Hear the animal sound and pick the right animal. Covers 12 animals with speech audio!',
+      link: '/animals',
+      badge: 'Science',
+    },
+    {
+      emoji: '📝',
+      title: 'Simple Sentences',
+      description: 'Arrange scrambled word tiles to build correct sentences. 15 beginner sentences!',
+      link: '/sentences',
+      badge: 'Language',
+    },
+    {
+      emoji: '🕐',
+      title: 'Telling Time',
+      description: 'Read the analog clock face and pick the correct digital time from four choices!',
+      link: '/time',
+      badge: 'Math',
+    },
+    {
+      emoji: '✏️',
+      title: 'Tracing & Handwriting',
+      description: 'Trace all 26 letters A–Z on an interactive canvas with letter guides beneath your pen!',
+      link: '/tracing',
+      badge: 'Writing',
+    },
+    {
+      emoji: '🔠',
+      title: 'Missing Letter',
+      description: 'Look at the picture — C _ T. Pick the missing letter to complete the word! 3 difficulty levels.',
+      link: '/missing-letter',
+      badge: 'Phonics',
+    },
+    {
+      emoji: '🎣',
+      title: 'Letter Fishing',
+      description: 'Hear the letter sound, then drag the matching tile to the hook. Trains phonics through audio!',
+      link: '/letter-fishing',
+      badge: 'Phonics',
+    },
+    {
+      emoji: '🏎️',
+      title: 'Multiplication Race',
+      description: 'Beat the clock! Answer ×tables as fast as you can. 5 difficulty levels up to ×12.',
+      link: '/multiplication-race',
+      badge: 'Math',
+    },
+    {
+      emoji: '➗',
+      title: 'Division Splitter',
+      description: 'Share items equally into groups. Visual group reveal — from ÷2 up to ÷12.',
+      link: '/division-splitter',
+      badge: 'Math',
+    },
   ];
 
   return (
-    <div className="min-h-screen p-4 md:p-6 lg:p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-10">
-          <header className="flex items-center justify-between mb-8">
-            <h1 className="text-4xl font-bold">Kiddy Learning Hub</h1>
-            <AuthButton />
-          </header>
-          <p className="text-2xl md:text-3xl text-gray-800 font-semibold mb-3">
-            Educational Games for Kids Ages 3-6
-          </p>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Interactive learning platform with ABC letters, numbers 1-100, shapes, and colors. Perfect for kindergarten children!
-          </p>
-        </div>
+    <div className="min-h-screen bg-white">
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          {apps.map((app, index) => (
-            <div key={index} data-link={app.link}>
-              <AppCard
-                emoji={app.emoji}
-                title={app.title}
-                description={app.description}
-                link={app.link}
-                progress={app.progress}
-                total={app.total}
-              />
-            </div>
+      {/* ── Masthead ─────────────────────────────────────────── */}
+      <header className="bg-black sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-xl">📚</span>
+            <span className="text-white font-light text-lg tracking-wide">Kiddy Learning Hub</span>
+          </div>
+          <nav className="hidden md:flex items-center gap-8">
+            <Link href="/learning-path" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">Learning Path</Link>
+            <Link href="/rewards" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">Rewards</Link>
+            <Link href="/community" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">Community</Link>
+            <Link href="/parent" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">Dashboard</Link>
+            <Link href="/upgrade" className="text-[#0070cc] text-sm font-semibold hover:text-[#1883fd] transition-colors">⭐ Upgrade</Link>
+            <Link href="/about" className="text-[#cccccc] text-sm font-medium hover:text-[#1883fd] transition-colors">About</Link>
+          </nav>
+          <AuthButton />
+        </div>
+      </header>
+
+      {/* ── Hero ─────────────────────────────────────────────── */}
+      <section className="bg-black py-24 md:py-32">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <h1 className="text-[40px] md:text-[54px] font-light text-white leading-tight tracking-[-0.1px] mb-6">
+            Give your child a head start —<br className="hidden md:block" /> before school begins
+          </h1>
+          <p className="text-[#6b6b6b] text-xl font-light max-w-2xl mx-auto mb-10 leading-relaxed">
+            Structured learning in math, reading and writing for children aged 3–6. Built around what kids need before school — and how they actually learn it. Free for every child.
+          </p>
+          <a href="#games" className="ps-btn text-[1.125rem] px-10 py-4">
+            Start Learning Free →
+          </a>
+        </div>
+      </section>
+
+      {/* ── Trust strip ──────────────────────────────────────── */}
+      <div className="bg-[#0a0a0a] border-y border-[#1a1a1a]">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-wrap items-center justify-center gap-x-10 gap-y-2">
+          {[
+            { icon: '🔒', text: 'No ads. Ever.' },
+            { icon: '🙅', text: 'No personal data sold' },
+            { icon: '👶', text: 'Designed for ages 3–6' },
+            { icon: '✅', text: 'Free for every child' },
+          ].map(({ icon, text }) => (
+            <span key={text} className="text-[#6b6b6b] text-sm flex items-center gap-1.5">
+              <span>{icon}</span>{text}
+            </span>
           ))}
         </div>
+      </div>
 
-        <div className="mt-12 pt-8 border-t-2 border-gray-100 bg-gradient-to-br from-gray-50 to-white rounded-3xl p-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+      {/* ── Games Grid ───────────────────────────────────────── */}
+      <section id="games" className="bg-[#f5f7fa] py-20">
+        <div className="max-w-7xl mx-auto px-6">
+
+          <h2 className="text-[35px] font-light text-black mb-3 leading-snug">
+            Core Learning
+          </h2>
+          <p className="text-[#6b6b6b] text-base mb-10">Foundational games covering letters, numbers, shapes, colors, math and vocabulary.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
+            {apps.map((app, index) => (
+              <AppCard key={index} {...app} />
+            ))}
+          </div>
+
+          <h2 className="text-[35px] font-light text-black mb-3 leading-snug">
+            New Games
+          </h2>
+          <p className="text-[#6b6b6b] text-base mb-10">Fresh challenges — spelling, memory, rhyming, patterns, sentences, time and more!</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
+            {newGames.map((game, index) => (
+              <NewGameCard key={index} {...game} />
+            ))}
+          </div>
+
+          {/* Info strip */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-12 border-t border-[#f3f3f3]">
             <div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">About Kiddy Learning Hub</h3>
-              <p className="text-gray-600 leading-relaxed text-sm">
-                Educational games designed specifically for kindergarten children ages 3-6. Our interactive learning platform helps children develop essential skills in alphabet recognition, number counting, shape identification, and color learning.
+              <h3 className="text-[18px] font-semibold text-black mb-3">About</h3>
+              <p className="text-[#6b6b6b] text-sm leading-relaxed">
+                Educational games designed for kindergarten children ages 3–6.
+                Learn alphabet, counting, shapes, colors, math, vocabulary and more — all in one place.
               </p>
             </div>
             <div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Educational Features</h3>
-              <ul className="text-gray-600 text-sm space-y-2">
-                <li className="flex items-start gap-2"><span className="text-teal-400 font-bold">✓</span> 26 ABC Letters with Phonics</li>
-                <li className="flex items-start gap-2"><span className="text-teal-400 font-bold">✓</span> Numbers 1-100 with Visual Counting</li>
-                <li className="flex items-start gap-2"><span className="text-teal-400 font-bold">✓</span> 10 Basic Geometric Shapes</li>
-                <li className="flex items-start gap-2"><span className="text-teal-400 font-bold">✓</span> 12 Colors with Mixing Activities</li>
-                <li className="flex items-start gap-2"><span className="text-teal-400 font-bold">✓</span> 296 Professional Educational Assets</li>
-                <li className="flex items-start gap-2"><span className="text-teal-400 font-bold">✓</span> Mobile & Tablet Friendly</li>
+              <h3 className="text-[18px] font-semibold text-black mb-3">Features</h3>
+              <ul className="text-[#6b6b6b] text-sm space-y-1.5">
+                <li>26 ABC Letters with phonics</li>
+                <li>Numbers 1–100 with visual counting</li>
+                <li>9 geometric shapes with fun facts</li>
+                <li>12 colors with real-world examples</li>
+                <li>Adaptive Math Engine — 5 levels</li>
+                <li>Word Builder — 4 levels</li>
+                <li>Memory Match, Spelling, Rhyming</li>
+                <li>Patterns, Sentences, Telling Time</li>
+                <li>Sight Words, Counting, Tracing</li>
               </ul>
             </div>
             <div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Perfect For</h3>
-              <ul className="text-gray-600 text-sm space-y-2">
-                <li className="flex items-start gap-2"><span className="text-teal-400 font-bold">✓</span> Kindergarten Preparation</li>
-                <li className="flex items-start gap-2"><span className="text-teal-400 font-bold">✓</span> Homeschooling Parents</li>
-                <li className="flex items-start gap-2"><span className="text-teal-400 font-bold">✓</span> Early Childhood Educators</li>
-                <li className="flex items-start gap-2"><span className="text-teal-400 font-bold">✓</span> Preschool Teachers</li>
-                <li className="flex items-start gap-2"><span className="text-teal-400 font-bold">✓</span> Children Ages 3-6</li>
-                <li className="flex items-start gap-2"><span className="text-teal-400 font-bold">✓</span> Family Learning Time</li>
+              <h3 className="text-[18px] font-semibold text-black mb-3">Perfect For</h3>
+              <ul className="text-[#6b6b6b] text-sm space-y-1.5">
+                <li>Kindergarten preparation</li>
+                <li>Homeschooling parents</li>
+                <li>Early childhood educators</li>
+                <li>Preschool teachers</li>
+                <li>Children ages 3–6</li>
+                <li>Family learning time</li>
               </ul>
             </div>
           </div>
-          <div className="text-center pt-6 border-t border-gray-200">
-            <p className="text-gray-500 text-sm mb-4">&copy; 2025 Kiddy Learning Hub. Educational games for children. All rights reserved.</p>
-            <div className="flex justify-center gap-6 flex-wrap">
-              <Link href="/privacy-policy" className="text-indigo-500 hover:text-teal-400 hover:underline text-sm">Privacy Policy</Link>
-              <Link href="/terms-of-service" className="text-indigo-500 hover:text-teal-400 hover:underline text-sm">Terms of Service</Link>
-              <Link href="/contact" className="text-indigo-500 hover:text-teal-400 hover:underline text-sm">Contact Us</Link>
-              <Link href="/about" className="text-indigo-500 hover:text-teal-400 hover:underline text-sm">About</Link>
-            </div>
-          </div>
         </div>
-      </div>
+      </section>
+
+      {/* ── Parent Dashboard promo ──────────────────────────── */}
+      <section className="bg-black py-16">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div>
+            <h2 className="text-[30px] font-light text-white mb-3">Track Your Child&apos;s Progress</h2>
+            <p className="text-[#6b6b6b] text-base max-w-xl leading-relaxed">
+              Sign in to unlock the Parent Dashboard — see mastery levels, weak areas that need practice,
+              and daily recommendations. Your child improves through 15 minutes of structured daily sessions.
+            </p>
+          </div>
+          <Link href="/parent" className="ps-btn text-base px-8 py-4 whitespace-nowrap flex-shrink-0">
+            View Dashboard →
+          </Link>
+        </div>
+      </section>
+
+      {/* ── Footer ───────────────────────────────────────────── */}
+      <footer style={{ backgroundColor: '#003791' }} className="text-white py-12">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <p className="font-light text-lg mb-3">Kiddy Learning Hub</p>
+          <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.6)' }}>
+            Free educational games for children ages 3–6
+          </p>
+          <div className="flex justify-center gap-8 flex-wrap text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
+            <Link href="/about" className="hover:text-white transition-colors">About</Link>
+            <Link href="/learning-path" className="hover:text-white transition-colors">Learning Path</Link>
+            <Link href="/rewards" className="hover:text-white transition-colors">Rewards</Link>
+            <Link href="/parent" className="hover:text-white transition-colors">Dashboard</Link>
+            <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
+            <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link>
+          </div>
+          <p className="text-xs mt-8" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            &copy; {new Date().getFullYear()} Kiddy Learning Hub. All rights reserved.
+          </p>
+        </div>
+      </footer>
+
     </div>
   );
 }

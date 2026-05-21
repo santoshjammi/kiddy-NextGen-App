@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useUserProgress } from '../../components/useUserProgress';
 
@@ -139,8 +139,11 @@ export default function ShapesPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-indigo-500">
-                <div className="text-white text-2xl animate-pulse">Loading Shapes... ✨</div>
+            <div className="min-h-screen bg-black flex items-center justify-center">
+                <div className="text-center">
+                    <div className="w-12 h-12 border-2 border-[#0070cc] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-[#6b6b6b] text-base font-light">Loading shapes&hellip;</p>
+                </div>
             </div>
         );
     }
@@ -149,41 +152,54 @@ export default function ShapesPage() {
     const shapeInfo = shapeData[currentShapeKey];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-400 to-teal-400 p-4 md:p-8">
-            <div className="max-w-4xl mx-auto bg-white/90 backdrop-blur-md rounded-3xl shadow-xl p-6 md:p-10">
-                <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                    <Link href="/" className="bg-indigo-500 text-white px-6 py-2 rounded-full">← Back to Hub</Link>
-                    <h1 className="text-3xl md:text-4xl font-fredoka text-indigo-600">🔺 Shape Explorer 🔺</h1>
-                    <div className="text-gray-500 font-semibold">Shape {currentIndex + 1} of {shapeKeys.length}</div>
+        <div className="min-h-screen bg-black">
+            {/* Nav */}
+            <header className="bg-black border-b border-[#1a1a1a] sticky top-0 z-50">
+                <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+                    <Link href="/" className="ps-btn ps-btn-sm ps-btn-ghost-dark">← Back</Link>
+                    <div className="text-center">
+                        <h1 className="text-[22px] font-light text-white tracking-[0.1px]">Shape Explorer</h1>
+                        <p className="text-[#6b6b6b] text-xs mt-0.5">Shape {currentIndex + 1} of {shapeKeys.length}</p>
+                    </div>
+                    <div className="text-[#0070cc] text-xs font-semibold">
+                        {completedShapes.size}/{shapeKeys.length}
+                    </div>
                 </div>
+            </header>
+
+            <div className="max-w-5xl mx-auto px-6 py-8">
+                <div className="bg-white rounded-[24px] p-6 md:p-10" style={{ boxShadow: 'rgba(0,0,0,0.08) 0 5px 9px 0' }}>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center mb-10">
                     <div className="flex flex-col items-center">
                         <div 
-                            className={`w-48 h-48 bg-indigo-500 shadow-lg mb-6 transition-all duration-500 flex items-center justify-center ${shapeInfo.className}`}
+                            className="w-40 h-40 bg-[#0070cc] shadow-[rgba(0,0,0,0.16)_0_5px_9px_0] mb-6 transition-all duration-500 flex items-center justify-center cursor-pointer"
                             onClick={() => playShapeAudio(currentShapeKey)}
                             style={{ 
                                 clipPath: 
-                                    currentShapeKey === 'circle' ? 'circle(50%)' :
-                                    currentShapeKey === 'square' ? 'inset(0)' :
-                                    currentShapeKey === 'triangle' ? 'polygon(50% 0%, 0% 100%, 100% 100%)' :
-                                    currentShapeKey === 'rectangle' ? 'inset(0 20% 0 20%)' :
-                                    currentShapeKey === 'diamond' ? 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' :
-                                    currentShapeKey === 'star' ? 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' :
-                                    currentShapeKey === 'heart' ? 'polygon(50% 15%, 80% 0%, 100% 30%, 50% 100%, 0% 30%, 20% 0%)' : 'none'
+                                    currentShapeKey === 'circle'    ? 'circle(50%)' :
+                                    currentShapeKey === 'square'    ? 'inset(0)' :
+                                    currentShapeKey === 'triangle'  ? 'polygon(50% 0%, 0% 100%, 100% 100%)' :
+                                    currentShapeKey === 'rectangle' ? 'inset(0 8% 20% 8%)' :
+                                    currentShapeKey === 'oval'      ? 'ellipse(50% 32% at 50% 50%)' :
+                                    currentShapeKey === 'diamond'   ? 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' :
+                                    currentShapeKey === 'star'      ? 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' :
+                                    currentShapeKey === 'heart'     ? 'polygon(50% 15%, 80% 0%, 100% 30%, 50% 100%, 0% 30%, 20% 0%)' :
+                                    currentShapeKey === 'hexagon'   ? 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)' :
+                                    'none'
                             }}
                         >
                             {/* Tailwind can't easily do all clip-paths for custom shapes without complex config, 
                                 so for this demo we use the logic provided or fallback to a simple div */}
                         </div>
-                        <p className="text-gray-400 text-sm italic">Tap the shape to hear its name!</p>
+                        <p className="text-[#6b6b6b] text-sm italic">Tap the shape to hear its name!</p>
                     </div>
 
                     <div className="text-center md:text-left">
-                        <h2 className="text-4xl font-bold text-gray-800 mb-2">{shapeInfo.name}</h2>
-                        <p className="text-xl text-indigo-600 mb-4">{shapeInfo.description}</p>
-                        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-xl italic text-gray-700">
-                            "{shapeInfo.funFact}"
+                        <h2 className="text-[35px] font-light text-black mb-2">{shapeInfo.name}</h2>
+                        <p className="text-[18px] text-[#0070cc] font-light mb-4">{shapeInfo.description}</p>
+                        <div className="bg-[#f5f7fa] border-l-4 border-[#0070cc] p-4 rounded-r-[12px] italic text-[#1f1f1f] text-sm leading-relaxed">
+                            &ldquo;{shapeInfo.funFact}&rdquo;
                         </div>
                     </div>
                 </div>
@@ -193,12 +209,12 @@ export default function ShapesPage() {
                         <button
                             key={key}
                             onClick={() => selectShape(idx)}
-                            className={`h-12 rounded-xl font-bold transition-all ${
+                            className={`ps-tile h-12 ${
                                 currentIndex === idx 
-                                ? 'bg-indigo-600 text-white ring-4 ring-indigo-200' 
+                                ? 'ps-tile-active' 
                                 : completedShapes.has(key)
-                                ? 'bg-green-400 text-white'
-                                : 'bg-gray-100 text-gray-400'
+                                ? 'ps-tile-done'
+                                : ''
                             }`}
                         >
                             {idx + 1}
@@ -207,9 +223,11 @@ export default function ShapesPage() {
                 </div>
 
                 <div className="flex flex-wrap justify-center gap-4">
-                    <button onClick={prevShape} disabled={currentIndex === 0} className="bg-gray-200 disabled:opacity-50 px-8 py-3 rounded-full font-bold">← Prev</button>
-                    <button onClick={nextShape} disabled={currentIndex === shapeKeys.length - 1} className="bg-gray-200 disabled:opacity-50 px-8 py-3 rounded-full font-bold">Next →</button>
-                    <button onClick={resetProgress} className="text-red-500 text-sm underline ml-4">Reset Progress</button>
+                    <button onClick={prevShape} disabled={currentIndex === 0} className="ps-btn ps-btn-sm ps-btn-ghost">← Prev</button>
+                    <button onClick={nextShape} disabled={currentIndex === shapeKeys.length - 1} className="ps-btn ps-btn-sm ps-btn-ghost">Next →</button>
+                    <button onClick={resetProgress} className="ps-btn ps-btn-sm ps-btn-ghost" style={{ color: '#c81b3a', borderColor: '#ffd0d0' }}>Reset</button>
+                </div>
+
                 </div>
             </div>
         </div>

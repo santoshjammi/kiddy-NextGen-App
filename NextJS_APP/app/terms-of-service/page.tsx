@@ -4,19 +4,20 @@ import Link from 'next/link';
 
 export default function TermsOfServicePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 p-4 md:p-8">
-      <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden">
-        {/* Header */}
-        <header className="bg-gradient-to-r from-gray-700 to-gray-900 text-white p-8 md:p-12 text-center">
-          <h1 className="text-4xl md:text-5xl font-fredoka mb-4">📋 Terms of Service</h1>
-          <nav className="text-gray-300 flex justify-center items-center gap-2">
-            <Link href="/" className="hover:text-white transition-colors">🏠 Home</Link>
-            <span className="opacity-50">→</span>
-            <span className="font-semibold">Terms of Service</span>
-          </nav>
-        </header>
+    <div className="min-h-screen bg-white">
+      {/* Nav */}
+      <header className="bg-black sticky top-0 z-50">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="ps-btn ps-btn-sm ps-btn-ghost-dark">← Home</Link>
+          <span className="text-white font-light text-lg">Terms of Service</span>
+          <div className="w-24" />
+        </div>
+      </header>
 
-        <div className="p-6 md:p-12 space-y-12">
+      <div className="max-w-5xl mx-auto px-6 py-16">
+        <h1 className="text-[54px] font-light text-black leading-tight tracking-[-0.1px] mb-6">
+          Terms of Service
+        </h1>
           {/* Last Updated */}
           <div className="text-sm text-gray-500 text-center">
             <p>Last updated: August 20, 2025</p>
@@ -126,7 +127,6 @@ export default function TermsOfServicePage() {
               <p>Governing Law: These Terms are governed by the laws of your local jurisdiction. Any disputes will be resolved in the courts of your local jurisdiction.</p>
             </div>
           </section>
-        </div>
 
         {/* Footer */}
         <footer className="bg-gray-50 p-8 text-center border-t">

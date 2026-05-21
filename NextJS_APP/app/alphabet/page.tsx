@@ -51,12 +51,7 @@ export default function AlphabetPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  const saveAlphabetProgress = useCallback((newSet: Set<string>) => {
-    setVisitedLetters(newSet);
-    localStorage.setItem('kiddyHub_alphabetCompleted', JSON.stringify([...newSet]));
-    syncToFirebase(Math.round((newSet.size / 26) * 100));
-  }, [syncToFirebase]);
-
+  // Progress celebration
   useEffect(() => {
     if (visitedLetters.size === 26) {
       setTimeout(() => {
@@ -121,36 +116,36 @@ export default function AlphabetPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-500 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-xl font-semibold">Loading magical letters... ✨</p>
+          <div className="w-12 h-12 border-2 border-[#0070cc] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-[#6b6b6b] text-base font-light">Loading ABC letters&hellip;</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-500 p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-8">
-          <div className="flex items-center gap-4 mb-6">
-            <Link href="/" className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-full transition-colors">
-              ← Back to Hub
-            </Link>
-            <div className="flex-1 text-center">
-              <h1 className="text-3xl md:text-4xl font-fredoka text-transparent bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text">
-                🌈 ABC Fun Land 🎉
-              </h1>
-              <p className="text-gray-600 mt-1">Click on letters to learn and have fun!</p>
-            </div>
+    <div className="min-h-screen bg-black">
+      {/* Nav */}
+      <header className="bg-black border-b border-[#1a1a1a] sticky top-0 z-50">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="ps-btn ps-btn-sm ps-btn-ghost-dark">← Back</Link>
+          <div className="text-center">
+            <h1 className="text-[22px] font-light text-white tracking-[0.1px]">ABC Letters</h1>
+            <p className="text-[#6b6b6b] text-xs mt-0.5">Click a letter to learn</p>
           </div>
+          <div className="text-[#6b6b6b] text-xs font-medium">
+            {visitedLetters.size}/26
+          </div>
+        </div>
+      </header>
 
-          <div className="w-full h-3 bg-gray-200 rounded-full mb-6 overflow-hidden">
-            <div 
-              className="h-full bg-gradient-to-r from-pink-400 to-purple-500 rounded-full transition-all duration-500"
-              style={{ width: `${progressPercentage}%` }}
-            ></div>
+      <div className="max-w-5xl mx-auto px-6 py-8">
+        <div className="bg-white rounded-[24px] p-6 md:p-8" style={{ boxShadow: 'rgba(0,0,0,0.08) 0 5px 9px 0' }}>
+
+          <div className="ps-progress-track mb-6">
+            <div className="ps-progress-fill" style={{ width: `${progressPercentage}%` }} />
           </div>
 
           <div className="grid grid-cols-6 md:grid-cols-9 gap-2 md:gap-3 mb-8">
@@ -158,12 +153,12 @@ export default function AlphabetPage() {
               <button
                 key={letter}
                 onClick={() => selectLetter(letter)}
-                className={`aspect-square rounded-xl flex flex-col items-center justify-center text-xl md:text-2xl font-bold transition-all duration-200 hover:scale-110 ${
+                className={`ps-tile aspect-square flex flex-col items-center justify-center text-xl md:text-2xl ${
                   currentLetter === letter
-                    ? 'bg-gradient-to-br from-pink-400 to-purple-500 text-white shadow-lg scale-110'
+                    ? 'ps-tile-active'
                     : visitedLetters.has(letter)
-                    ? 'bg-green-400 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-pink-100'
+                    ? 'ps-tile-done'
+                    : ''
                 }`}
               >
                 <span>{letter}</span>
@@ -171,11 +166,11 @@ export default function AlphabetPage() {
             ))}
           </div>
 
-          <div className={`bg-gradient-to-br from-yellow-100 to-orange-100 rounded-3xl p-8 mb-6 text-center ${showCelebration ? 'animate-pulse' : ''}`}>
-            <div className="text-8xl md:text-9xl font-fredoka text-transparent bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text mb-4">
+          <div className={`bg-[#f5f7fa] rounded-[19px] p-8 mb-6 text-center ${showCelebration ? 'scale-[1.01] transition-transform' : ''}`}>
+            <div className="text-8xl md:text-9xl font-light text-[#0070cc] mb-4" style={{ letterSpacing: '-2px' }}>
               {currentLetter || '?'}
             </div>
-            <div className="text-3xl font-semibold text-gray-700 mb-4">
+            <div className="text-[28px] font-light text-[#1f1f1f] mb-4">
               {currentLetter ? alphabetData[currentLetter].word : 'Click a letter to start!'}
             </div>
             {currentLetter && alphabetData[currentLetter].image && (
@@ -192,30 +187,18 @@ export default function AlphabetPage() {
 
           <div className="flex flex-wrap justify-center gap-4">
             {currentLetter && (
-              <button
-                onClick={repeatAudio}
-                className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-6 py-3 rounded-full font-semibold hover:scale-105 transition-transform shadow-lg"
-              >
-                🔊 Say it Again!
+              <button onClick={repeatAudio} className="ps-btn ps-btn-sm">
+                🔊 Say it Again
               </button>
             )}
-            <button
-              onClick={selectRandomLetter}
-              className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-3 rounded-full font-semibold hover:scale-105 transition-transform shadow-lg"
-            >
-              🎲 Surprise Me!
+            <button onClick={selectRandomLetter} className="ps-btn ps-btn-sm">
+              🎲 Surprise
             </button>
-            <button
-              onClick={resetProgress}
-              className="bg-gradient-to-r from-gray-400 to-gray-500 text-white px-6 py-3 rounded-full font-semibold hover:scale-105 transition-transform shadow-lg"
-            >
-              🔄 Start Over
+            <button onClick={resetProgress} className="ps-btn ps-btn-sm ps-btn-ghost">
+              Reset Progress
             </button>
           </div>
 
-          <div className="text-center mt-8 text-6xl cursor-pointer" title="Hi! I'm Alphabear! 🐻">
-            🐻
-          </div>
         </div>
       </div>
     </div>

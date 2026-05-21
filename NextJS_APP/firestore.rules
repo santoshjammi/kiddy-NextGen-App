@@ -1,0 +1,64 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Each user can read and write their own document AND all their subcollections.
+    // This covers:
+    //   users/{uid}                        ← root user doc (isPremium, profile)
+    //   users/{uid}/progress/{subject}     ← useSubjectProgress
+    //   users/{uid}/rewards/current        ← useRewards (isPremium lives here too)
+    //   users/{uid}/sessions/{id}          ← session logs from useRewards.logSession
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      match /{document=**} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // ── Community Feedback Hub ────────────────────────────────────
+    // Set FOUNDER_EMAIL below to the founder's Google account email.
+    function isFounder() {
+      return request.auth != null
+          && request.auth.token.email == 'REPLACE_WITH_FOUNDER_EMAIL';
+    }
+
+    match /feedback_posts/{postId} {
+      allow read: if true;
+
+      allow create: if request.auth != null
+          && request.resource.data.userId == request.auth.uid
+          && request.resource.data.keys().hasAll(['userId', 'authorName', 'title', 'category', 'body', 'createdAt']);
+
+      allow update: if request.auth != null && (
+          // owner can edit their own body / title
+          (resource.data.userId == request.auth.uid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['body', 'title']))
+          // any authed user can toggle their like (likes field only)
+          || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes'])
+          // founder can pin / resolve / lock / update replyCount
+          || (isFounder()
+            && request.resource.data.diff(resource.data).affectedKeys()
+                .hasOnly(['pinned', 'resolved', 'locked', 'replyCount']))
+      );
+
+      allow delete: if false;
+
+      match /replies/{replyId} {
+        allow read: if true;
+        allow create: if request.auth != null
+            && request.resource.data.authorId == request.auth.uid;
+        allow update, delete: if false;
+      }
+    }
+
+    match /feedback_votes/{voteId} {
+      allow read: if request.auth != null
+          && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null
+          && request.resource.data.userId == request.auth.uid
+          && request.resource.data.postId is string;
+      allow delete: if request.auth != null
+          && resource.data.userId == request.auth.uid;
+    }
+  }
+}
