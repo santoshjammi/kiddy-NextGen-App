@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
+import audioEngine from '../../remotion/audio/audioEngine';
 
 interface Animal {
   name: string;
@@ -34,14 +35,7 @@ function getChoices(correct: Animal, all: Animal[]): Animal[] {
   return shuffle([correct, ...others]);
 }
 
-function speakSound(soundWord: string) {
-  if (typeof window === 'undefined' || !window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  const utt = new SpeechSynthesisUtterance(soundWord + '!');
-  utt.rate = 0.85;
-  utt.pitch = 1.3;
-  window.speechSynthesis.speak(utt);
-}
+
 
 export default function AnimalSoundsPage() {
   const [questions] = useState(() => shuffle(ANIMALS));
@@ -55,9 +49,11 @@ export default function AnimalSoundsPage() {
   const current = questions[index];
 
   const playSound = useCallback(() => {
-    setSpeaking(true);
-    speakSound(current.soundWord);
-    setTimeout(() => setSpeaking(false), 1200);
+    audioEngine.speak(
+      current.soundWord + '!',
+      () => setSpeaking(true),
+      () => setSpeaking(false)
+    );
   }, [current.soundWord]);
 
   const pick = (name: string) => {
@@ -67,6 +63,8 @@ export default function AnimalSoundsPage() {
   };
 
   const next = () => {
+    audioEngine.stopAll();
+    setSpeaking(false);
     if (index + 1 >= questions.length) {
       setDone(true);
     } else {
@@ -76,6 +74,8 @@ export default function AnimalSoundsPage() {
   };
 
   const restart = () => {
+    audioEngine.stopAll();
+    setSpeaking(false);
     setIndex(0);
     setSelected(null);
     setScore(0);
@@ -160,7 +160,13 @@ export default function AnimalSoundsPage() {
                 cls += 'bg-white border-[#e0e0e0] opacity-40';
               }
               return (
-                <button key={animal.name} onClick={() => pick(animal.name)} className={cls}>
+                <button
+                  key={animal.name}
+                  onClick={() => pick(animal.name)}
+                  className={cls}
+                  data-testid="animal-choice"
+                  data-correct={isCorrect}
+                >
                   <span className="text-5xl">{animal.emoji}</span>
                   <span className={[
                     'font-semibold text-sm',

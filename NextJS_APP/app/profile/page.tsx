@@ -45,6 +45,7 @@ export default function ProfilePage() {
         <h2 className="text-[35px] font-light text-black mb-1">{user.displayName || 'Learner'}</h2>
         <p className="text-[#6b6b6b] mb-8 font-light">{user.email}</p>
         <Link href="/" className="ps-btn">← Back to Hub</Link>
+        <Link href="/community" className="block ps-btn ps-btn-ghost mt-3">💬 Community</Link>
       </div>
     </div>
   );

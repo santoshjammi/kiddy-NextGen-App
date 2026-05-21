@@ -2,12 +2,14 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import AuthButton from '../../components/AuthButton';
 import { useSubjectProgress } from '../../components/useSubjectProgress';
 import { useRewards } from '../../components/useRewards';
+import { useGameTelemetry } from '../../components/useGameTelemetry';
+import GameWrapper from '../../remotion/GameWrapper';
+import eventBus from '../../remotion/eventBus';
+import audioEngine from '../../remotion/audio/audioEngine';
 
 // ── Word bank ──────────────────────────────────────────────────────
-// Each entry: word + emoji + which index is the blank + level
 interface WordItem {
   word: string;
   emoji: string;
@@ -64,9 +66,8 @@ function shuffle<T>(arr: T[]): T[] {
 function getChoices(word: string, blankIndex: number, level: number): string[] {
   const correct = word[blankIndex].toUpperCase();
   // Level 1 = CVC words with a missing vowel: always show A E I O U
-  // This is pedagogically correct and teaches vowel recognition explicitly.
   if (level === 1) return ['A', 'E', 'I', 'O', 'U'];
-  // Level 2+ = any letter blank: show 5 choices including the correct one
+  // Level 2+ = any letter blank: show 5 choices including correct letter
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   const wrong = shuffle(alphabet.filter(c => c !== correct)).slice(0, 4);
   return shuffle([correct, ...wrong]);
@@ -77,20 +78,117 @@ function getWordsForLevel(level: number): WordItem[] {
   return shuffle(WORDS.filter(w => w.level === lvl));
 }
 
+// ── Choice tile component with pointer-event drag ─────────────────
+interface ChoiceTileProps {
+  letter: string;
+  onDrop: (letter: string) => void;
+  feedback: 'correct' | 'wrong' | null;
+  isCorrect: boolean;
+  isSelected: boolean;
+  disabled: boolean;
+}
+
+function ChoiceTile({ letter, onDrop, feedback, isCorrect, isSelected, disabled }: ChoiceTileProps) {
+  const tileRef = useRef<HTMLButtonElement>(null);
+  const dragging = useRef(false);
+  const startPos = useRef({ x: 0, y: 0 });
+
+  const getStyle = () => {
+    if (feedback && isSelected) {
+      return feedback === 'correct'
+        ? 'bg-emerald-500 border-emerald-400 text-white scale-110 shadow-lg shadow-emerald-500/20'
+        : 'bg-amber-400 border-amber-300 text-white scale-105 shadow-md shadow-amber-500/10 animate-shake';
+    }
+    if (feedback && isCorrect) {
+      return 'bg-emerald-500/20 border-emerald-400/30 text-emerald-200';
+    }
+    if (disabled && !isSelected) {
+      return 'bg-white/5 border-white/10 text-white/30 opacity-40 cursor-not-allowed';
+    }
+    return 'bg-white/10 border-white/20 text-white hover:bg-emerald-500/30 hover:border-emerald-400 hover:scale-105 active:scale-95 cursor-grab active:cursor-grabbing';
+  };
+
+  const onPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (disabled) return;
+    e.preventDefault();
+    dragging.current = true;
+    startPos.current = { x: e.clientX, y: e.clientY };
+    const el = tileRef.current;
+    if (!el) return;
+    el.setPointerCapture(e.pointerId);
+    el.style.transition = 'none';
+    el.style.zIndex = '999';
+    el.style.position = 'relative';
+  };
+
+  const onPointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (!dragging.current) return;
+    const el = tileRef.current;
+    if (!el) return;
+    const dx = e.clientX - startPos.current.x;
+    const dy = e.clientY - startPos.current.y;
+    el.style.transform = `translate(${dx}px, ${dy}px) scale(1.12)`;
+
+    // Highlight blank slot while hovering
+    const blankEl = document.getElementById('missing-letter-blank-slot');
+    if (blankEl) {
+      const rect = blankEl.getBoundingClientRect();
+      const over = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
+      blankEl.classList.toggle('ring-4', over);
+      blankEl.classList.toggle('ring-emerald-400', over);
+    }
+  };
+
+  const onPointerUp = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (!dragging.current) return;
+    dragging.current = false;
+    const el = tileRef.current;
+    if (el) {
+      el.style.transform = '';
+      el.style.transition = '';
+      el.style.zIndex = '';
+    }
+    // Remove blank highlight
+    const blankEl = document.getElementById('missing-letter-blank-slot');
+    if (blankEl) {
+      blankEl.classList.remove('ring-4', 'ring-emerald-400');
+    }
+    // Check if dropped onto blank slot
+    const rect = blankEl?.getBoundingClientRect();
+    if (rect) {
+      const overBlank = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
+      if (overBlank) {
+        onDrop(letter);
+        return;
+      }
+    }
+  };
+
+  return (
+    <button
+      ref={tileRef}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onClick={() => !disabled && !feedback && onDrop(letter)}
+      disabled={disabled}
+      data-testid="choice-button"
+      data-correct={isCorrect ? 'true' : 'false'}
+      className={`h-14 w-14 sm:h-16 sm:w-16 md:h-20 md:w-20 flex items-center justify-center text-[26px] sm:text-[32px] md:text-[36px] font-bold rounded-[20px] border-2 transition-all duration-150 select-none touch-none shadow-sm ${getStyle()}`}
+    >
+      {letter}
+    </button>
+  );
+}
+
 export default function MissingLetterPage() {
   const { progress, recordSolve } = useSubjectProgress('missing-letter');
-  const { recordCorrect, logSession } = useRewards();
-  const sessionStart = useRef(Date.now());
+  const { recordCorrect } = useRewards();
+
   const level = Math.min(3, progress.difficulty_level);
 
-  useEffect(() => {
-    sessionStart.current = Date.now();
-    return () => {
-      const mins = Math.max(1, Math.round((Date.now() - sessionStart.current) / 60000));
-      logSession({ subject: 'english', durationMinutes: mins, completedModules: 1 });
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Telemetry custom hook initialization
+  const telemetry = useGameTelemetry('missing-letter', 'english');
 
   // Initialise queue and choices together so choices always match queue[0]
   const [queue, setQueue] = useState<WordItem[]>(() => getWordsForLevel(1));
@@ -101,8 +199,8 @@ export default function MissingLetterPage() {
   });
   const [selected, setSelected] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
-  const [session, setSession] = useState({ correct: 0, total: 0 });
-  const [streak, setStreak] = useState(0);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [sessionCompleted, setSessionCompleted] = useState(false);
 
   const item = queue[index % queue.length];
 
@@ -110,153 +208,258 @@ export default function MissingLetterPage() {
     const nextIdx = (index + 1) % queue.length;
     // Refill when cycling
     if (nextIdx === 0) {
-      const lvl = Math.min(3, progress.difficulty_level);
-      const newQueue = getWordsForLevel(lvl);
+      const newQueue = getWordsForLevel(level);
       setQueue(newQueue);
-      setChoices(getChoices(newQueue[0].word, newQueue[0].blankIndex, lvl));
+      setChoices(getChoices(newQueue[0].word, newQueue[0].blankIndex, level));
     } else {
       setChoices(getChoices(queue[nextIdx].word, queue[nextIdx].blankIndex, level));
     }
     setIndex(nextIdx);
     setSelected(null);
     setFeedback(null);
-  }, [index, queue, progress.difficulty_level, level]);
+  }, [index, queue, level]);
+
+  // Voice narration player
+  const playAudio = useCallback(() => {
+    if (sessionCompleted || !item) return;
+    setIsSpeaking(true);
+    // Explicitly record narration replay in telemetry
+    telemetry.recordReplay();
+
+    const spelledWord = item.word.toUpperCase().split('').map((c, i) => i === item.blankIndex ? 'blank' : c).join(' ');
+    audioEngine.speak(
+      `Spell the word ${item.word}. It is written as ${spelledWord}. What is the missing letter?`,
+      () => setIsSpeaking(true),
+      () => setIsSpeaking(false)
+    );
+  }, [item, telemetry, sessionCompleted]);
+
+  // Initial welcome auto play voice prompt
+  useEffect(() => {
+    if (sessionCompleted || !item) return;
+    const t = setTimeout(() => {
+      setIsSpeaking(true);
+      const spelledWord = item.word.toUpperCase().split('').map((c, i) => i === item.blankIndex ? 'blank' : c).join(' ');
+      audioEngine.speak(
+        `Spell the word ${item.word}. It is written as ${spelledWord}. What is the missing letter?`,
+        () => setIsSpeaking(true),
+        () => setIsSpeaking(false)
+      );
+    }, 1800); // Wait for IntroScene animations
+
+    return () => clearTimeout(t);
+  }, [item?.word, index, sessionCompleted]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Start telemetry question timer immediately when index changes
+  useEffect(() => {
+    if (sessionCompleted || !item) return;
+    telemetry.startQuestion(index);
+  }, [index, sessionCompleted, item?.word]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Session start EventBus trigger
+  useEffect(() => {
+    eventBus.emit('GAME_START');
+  }, []);
 
   const handleChoice = async (letter: string) => {
-    if (feedback) return;
+    if (feedback || sessionCompleted) return;
     setSelected(letter);
     const correct = letter === item.word[item.blankIndex].toUpperCase();
     setFeedback(correct ? 'correct' : 'wrong');
-    setStreak(s => correct ? s + 1 : 0);
-    setSession(s => ({ correct: s.correct + (correct ? 1 : 0), total: s.total + 1 }));
 
-    await recordSolve(correct, correct ? undefined : `missing_letter_level${level}`);
-    if (correct) recordCorrect('english');
+    // Telemetry: record attempt and programmatically compute struggle tag
+    const targetChar = item.word[item.blankIndex];
+    const struggleTag = telemetry.recordAnswer(correct, targetChar, item.word, item.level);
 
-    setTimeout(advance, correct ? 1000 : 1600);
+    // Save solve outcome to progression db
+    await recordSolve(correct, struggleTag);
+
+    if (correct) {
+      recordCorrect('english');
+      // Fire CORRECT_ANSWER EventBus sequence
+      eventBus.emit('CORRECT_ANSWER');
+
+      // Check if session completed target questions (5 questions target)
+      const nextCorrectCount = telemetry.correctAnswers + 1;
+      if (nextCorrectCount >= 5) {
+        setSessionCompleted(true);
+        // Triggers SESSION_COMPLETE celebration and Firestore telemetry write inside GameWrapper
+        telemetry.completeSession();
+        return;
+      }
+    } else {
+      // Fire WRONG_ANSWER EventBus sequence
+      eventBus.emit('WRONG_ANSWER');
+    }
+
+    setTimeout(advance, correct ? 1200 : 1800);
+  };
+
+  const handlePlayAgain = () => {
+    // Reset state to play another round
+    setSessionCompleted(false);
+    const newQueue = getWordsForLevel(level);
+    setQueue(newQueue);
+    setChoices(getChoices(newQueue[0].word, newQueue[0].blankIndex, level));
+    setIndex(0);
+    setSelected(null);
+    setFeedback(null);
+    eventBus.emit('GAME_START');
   };
 
   // Build the display with the blank slot
-  const wordDisplay = item.word.toUpperCase().split('').map((ch, i) => ({
-    char: i === item.blankIndex ? (selected ?? '_') : ch,
+  const wordDisplay = item ? item.word.toUpperCase().split('').map((ch, i) => ({
+    char: i === item.blankIndex ? (selected ?? '\u00a0') : ch,
     isBlank: i === item.blankIndex,
     revealed: feedback !== null && i === item.blankIndex,
-  }));
+  })) : [];
 
   return (
-    <div className="min-h-screen bg-black">
-
-      {/* ── Header ──────────────────────────────────────────── */}
-      <header className="bg-black border-b border-[#1a1a1a] sticky top-0 z-50">
-        <div className="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="ps-btn ps-btn-sm ps-btn-ghost-dark">← Back</Link>
-          <div className="text-center">
-            <h1 className="text-[20px] font-light text-white">Missing Letter</h1>
-            <p className="text-[#6b6b6b] text-xs mt-0.5">Fill in the blank to complete the word</p>
-          </div>
-          <AuthButton />
-        </div>
-      </header>
-
-      <div className="max-w-2xl mx-auto px-6 py-8 flex flex-col gap-6">
-
-        {/* ── Stats ───────────────────────────────────────── */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="bg-[#0070cc] text-white px-4 py-1.5 rounded-full text-sm font-semibold">
-              Level {level}
-            </span>
-            <span className="text-[#6b6b6b] text-sm">{session.correct}/{session.total} correct</span>
-          </div>
-          <div className="flex items-center gap-3">
-            {streak >= 2 && <span className="text-orange-400 text-sm font-bold">🔥 {streak}</span>}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-[#6b6b6b]">{progress.mastery_score}%</span>
-              <div className="w-20 h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden">
-                <div className="h-full bg-[#0070cc] rounded-full" style={{ width: `${progress.mastery_score}%` }} />
-              </div>
+    <GameWrapper
+      gameId="missing-letter"
+      subject="english"
+      world="jungle"
+      title="Missing Letter"
+      subtitle="Fill in the blank to complete the word"
+      mascot="owl"
+      onHintClick={telemetry.recordHint}
+    >
+      <div className="flex flex-col gap-6">
+        
+        {sessionCompleted ? (
+          /* ── Celebration / Completed view ─────────────────────── */
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-[32px] p-8 md:p-12 text-center flex flex-col items-center gap-6 shadow-2xl animate-fade-in">
+            <div className="text-7xl animate-bounce">🏆</div>
+            <h2 className="text-3xl font-extrabold text-white">Wonderful Session!</h2>
+            <p className="text-white/80 max-w-md text-sm md:text-base leading-relaxed">
+              Super spelling work! You solved all <strong className="text-yellow-300">5</strong> missing letters. Your progress telemetry has been successfully compiled and stored.
+            </p>
+            <div className="flex flex-wrap gap-4 justify-center mt-4">
+              <button
+                onClick={handlePlayAgain}
+                className="px-8 py-3.5 bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white rounded-full font-bold shadow-lg shadow-emerald-500/20 active:scale-95 transition-all duration-150"
+              >
+                Play Again 🦉
+              </button>
+              <Link
+                href="/learning-path"
+                className="px-8 py-3.5 bg-white/15 hover:bg-white/25 border border-white/20 text-white rounded-full font-bold active:scale-95 transition-all duration-150"
+              >
+                Learning Path →
+              </Link>
             </div>
           </div>
-        </div>
+        ) : (
+          /* ── Active Gameplay view ──────────────────────────────── */
+          <div className="flex flex-col gap-6">
+            <div
+              className="bg-white/10 backdrop-blur-md border border-white/20 rounded-[32px] p-6 md:p-10 flex flex-col items-center gap-8 shadow-2xl relative overflow-hidden"
+            >
+              {/* Animated backdrop jungle foliage circles */}
+              <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-emerald-400/10 rounded-full blur-2xl animate-pulse" />
+              <div className="absolute -top-10 -left-10 w-40 h-40 bg-lime-400/10 rounded-full blur-2xl animate-pulse" />
 
-        {/* ── Main card ───────────────────────────────────── */}
-        <div
-          className="bg-white rounded-[24px] p-8 md:p-14 flex flex-col items-center gap-10"
-          style={{ boxShadow: 'rgba(0,0,0,0.12) 0 8px 24px 0' }}
-        >
-          {/* Emoji */}
-          <div className="text-[96px] leading-none select-none">{item.emoji}</div>
+              {/* Emoji illustration */}
+              {item && (
+                <div className="text-7xl md:text-8xl leading-none select-none drop-shadow-md z-10 transform hover:scale-105 transition-transform duration-200">
+                  {item.emoji}
+                </div>
+              )}
 
-          {/* Word with blank */}
-          <div className="flex items-center gap-3 md:gap-5">
-            {wordDisplay.map((slot, i) => (
-              <div
-                key={i}
-                className={`
-                  w-14 h-16 md:w-16 md:h-20 flex items-center justify-center
-                  text-[36px] md:text-[44px] font-bold rounded-[12px] select-none
-                  transition-all duration-200
-                  ${slot.isBlank
-                    ? feedback === 'correct'
-                      ? 'bg-green-100 border-2 border-green-400 text-green-700 scale-110'
-                      : feedback === 'wrong'
-                      ? 'bg-red-100 border-2 border-red-400 text-red-600'
-                      : 'bg-[#0070cc]/10 border-2 border-dashed border-[#0070cc] text-[#0070cc]'
-                    : 'bg-[#f5f7fa] text-gray-800'
-                  }
-                `}
-              >
-                {slot.isBlank && feedback === 'wrong'
-                  ? item.word[item.blankIndex].toUpperCase()
-                  : slot.char}
+              {/* Word characters with blank tile */}
+              <div className="flex items-center gap-2.5 sm:gap-4 md:gap-5 z-10">
+                {wordDisplay.map((slot, i) => (
+                  <div
+                    key={i}
+                    id={slot.isBlank ? 'missing-letter-blank-slot' : undefined}
+                    className={`
+                      w-12 h-14 sm:w-16 sm:h-20 flex items-center justify-center
+                      text-[28px] sm:text-[44px] font-bold rounded-[20px] select-none
+                      border-2 shadow-sm transition-all duration-200
+                      ${slot.isBlank
+                        ? feedback === 'correct'
+                          ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 scale-110 shadow-lg shadow-emerald-500/20'
+                          : feedback === 'wrong'
+                          ? 'bg-amber-500/20 border-amber-400 text-amber-300 animate-shake'
+                          : 'bg-emerald-950/40 border-dashed border-2 border-emerald-400/70 text-emerald-300 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] animate-pulse scale-105'
+                        : 'bg-white/10 border-white/10 text-white'
+                      }
+                    `}
+                  >
+                    {slot.char}
+                  </div>
+                ))}
               </div>
-            ))}
+
+              {/* Audio narrative player button */}
+              <button
+                onClick={playAudio}
+                className={`flex flex-col items-center gap-2 px-8 py-3 rounded-[24px] border-2 transition-all duration-200 z-10 ${
+                  isSpeaking
+                    ? 'bg-emerald-600 border-emerald-500 text-white scale-95 shadow-md shadow-emerald-500/30'
+                    : 'bg-white/5 border-emerald-400/40 text-emerald-200 hover:bg-emerald-500/25 hover:border-emerald-300 hover:scale-105'
+                }`}
+              >
+                <span className="text-3xl">{isSpeaking ? '🔊' : '🔈'}</span>
+                <span className="text-xs font-bold tracking-wide uppercase">
+                  {isSpeaking ? 'Listening...' : 'Hear Word'}
+                </span>
+              </button>
+
+              {/* Encouragement message */}
+              <div className="h-8 flex items-center justify-center z-10">
+                {feedback === 'correct' && item && (
+                  <p className="text-lg md:text-xl font-extrabold text-emerald-300 animate-pulse">
+                    🎉 Excellent! {item.word.toUpperCase()}!
+                  </p>
+                )}
+                {feedback === 'wrong' && (
+                  <p className="text-base md:text-lg font-bold text-amber-200 animate-pulse">
+                    We can do it! Let us try again! 🌟
+                  </p>
+                )}
+              </div>
+
+              {/* Choice character buttons bank */}
+              <div className="w-full border-t border-white/10 pt-6 z-10">
+                <p className="text-center text-xs text-white/50 mb-4 font-medium tracking-wide">
+                  Drag a letter to the blank slot, or tap it! 🌟
+                </p>
+                <div className="grid grid-cols-5 gap-2 sm:gap-3 max-w-lg mx-auto justify-items-center">
+                  {choices.map(letter => {
+                    const isSelected = selected === letter;
+                    const isCorrect = item && letter === item.word[item.blankIndex].toUpperCase();
+                    
+                    return (
+                      <ChoiceTile
+                        key={letter}
+                        letter={letter}
+                        onDrop={handleChoice}
+                        feedback={feedback}
+                        isCorrect={!!isCorrect}
+                        isSelected={isSelected}
+                        disabled={!!feedback}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Instruction Tip */}
+            <div className="bg-emerald-950/40 border border-emerald-500/20 rounded-[20px] p-5 text-center shadow-inner z-10">
+              <p className="text-emerald-200/70 text-xs md:text-sm leading-relaxed">
+                Look at the picture above, then drag or tap the correct letter to fill the blank. Work through 3 spelling levels!
+                <br />
+                <span className="text-lime-300/80 font-bold mt-1 inline-block">
+                  Level 1: CVC vowels · Level 2: 4-letter blends · Level 3: 5-letter structures
+                </span>
+              </p>
+            </div>
           </div>
-
-          {/* Feedback message */}
-          {feedback === 'correct' && (
-            <p className="text-2xl font-bold text-green-500">🎉 {item.word.toUpperCase()}!</p>
-          )}
-          {feedback === 'wrong' && (
-            <p className="text-xl font-bold text-red-500">
-              The letter was &quot;{item.word[item.blankIndex].toUpperCase()}&quot;
-            </p>
-          )}
-
-          {/* Choice buttons */}
-          <div className="flex gap-4 flex-wrap justify-center">
-            {choices.map(letter => {
-              const isSelected = selected === letter;
-              const isCorrect = letter === item.word[item.blankIndex].toUpperCase();
-              let cls = 'w-16 h-16 md:w-20 md:h-20 text-[32px] md:text-[40px] font-bold rounded-[16px] border-2 transition-all duration-150 select-none ';
-              if (feedback && isSelected) {
-                cls += feedback === 'correct'
-                  ? 'bg-green-400 border-green-500 text-white scale-110 shadow-lg'
-                  : 'bg-red-400 border-red-500 text-white';
-              } else if (feedback && isCorrect) {
-                cls += 'bg-green-100 border-green-400 text-green-700';
-              } else if (!feedback) {
-                cls += 'bg-[#f5f7fa] border-[#e0e0e0] text-gray-800 hover:bg-[#0070cc] hover:border-[#0070cc] hover:text-white hover:scale-105 cursor-pointer';
-              } else {
-                cls += 'bg-[#f5f7fa] border-[#e0e0e0] text-gray-400 opacity-50';
-              }
-              return (
-                <button key={letter} className={cls} onClick={() => handleChoice(letter)} disabled={!!feedback}>
-                  {letter}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* ── Hint strip ───────────────────────────────────── */}
-        <div className="bg-[#0d0d0d] border border-[#1a1a1a] rounded-[16px] p-4 text-center">
-          <p className="text-[#6b6b6b] text-sm">
-            Look at the picture, then pick the correct letter to fill the blank. Work through 3 difficulty levels!
-          </p>
-        </div>
+        )}
 
       </div>
-    </div>
+    </GameWrapper>
   );
 }

@@ -1,0 +1,367 @@
+meta:
+
+  project: Kiddy
+  module: Community Feedback Hub
+  target: Github Copilot Agent Mode
+  implementation_priority: P0
+  owner: Santosh Jammi
+  status: approved_for_implementation
+
+objective:
+
+  statement: >
+
+    Build an in-app parent-facing community and feedback system.
+
+    Parents can:
+
+    - submit feedback
+    - request features
+    - report learning concerns
+    - discuss product experiences
+
+    Founder can:
+
+    - reply directly
+    - pin responses
+    - mark posts resolved
+    - create announcements
+
+    Community conversations are visible across all users.
+
+business_goal:
+
+  purpose:
+
+    - collect_customer_learning
+    - identify_product_gaps
+    - increase_parent_trust
+    - reduce_hidden_support
+    - expose_real_pain_points
+
+rules:
+
+  must:
+
+    - parent_accounts_only
+    - authenticated_access_only
+    - public_visibility
+    - founder_responses_visible
+    - mobile_first
+    - firestore_backed
+
+  never:
+
+    - anonymous_posts
+    - direct_messages
+    - child_accounts_posting
+    - realtime_chatrooms
+    - external_forum_services
+
+routes:
+
+  community_feed:
+
+    path: /community
+
+    purpose: public_feedback_wall
+
+  post_detail:
+
+    path: /community/[postId]
+
+    purpose: thread_view
+
+  create_post:
+
+    path: /community/new
+
+    purpose: submit_feedback
+
+navigation:
+
+  add_to:
+
+    - navbar
+    - parent_dashboard
+    - profile
+    - upgrade_page
+
+roles:
+
+  parent:
+
+    permissions:
+
+      - create_post
+      - reply
+      - like
+      - bookmark
+      - edit_own_post
+
+  founder:
+
+    permissions:
+
+      - reply
+      - pin_post
+      - mark_resolved
+      - lock_thread
+      - create_announcement
+
+  admin:
+
+    permissions:
+
+      - moderate
+      - delete
+      - ban
+
+ui:
+
+  design_source:
+
+    shell: playstation_parent_shell
+
+  cards:
+
+    border_radius: 24px
+
+  behavior:
+
+    mobile_first: true
+
+    interactions:
+
+      - soft_motion
+      - subtle_hover
+      - bunny_reactions
+
+pages:
+
+  community_feed:
+
+    components:
+
+      - top_filters
+      - post_list
+      - trending_posts
+      - founder_updates
+
+  create_post:
+
+    components:
+
+      - title_input
+      - category_selector
+      - rich_text_area
+      - optional_screenshot_upload
+      - submit_button
+
+  post_detail:
+
+    components:
+
+      - original_post
+      - replies
+      - founder_badges
+      - reply_editor
+      - solved_indicator
+
+forms:
+
+  create_post:
+
+    fields:
+
+      title:
+
+        type: text
+        required: true
+        max_length: 120
+
+      category:
+
+        type: select
+
+        options:
+
+          - feature_request
+          - bug
+          - learning_issue
+          - parent_suggestion
+          - app_experience
+          - game_feedback
+
+      message:
+
+        type: textarea
+        required: true
+        max_length: 1000
+
+      child_age:
+
+        optional: true
+
+      screenshot:
+
+        optional: true
+
+firestore:
+
+  collections:
+
+    feedback_posts:
+
+      path: feedback_posts/{postId}
+
+      schema:
+
+        id: string
+        userId: string
+        authorName: string
+        title: string
+        category: string
+        body: string
+        likes: number
+        replyCount: number
+        resolved: boolean
+        pinned: boolean
+        createdAt: timestamp
+
+    feedback_replies:
+
+      path: feedback_posts/{postId}/replies/{replyId}
+
+      schema:
+
+        authorId: string
+        authorName: string
+        role: parent|founder
+        message: string
+        createdAt: timestamp
+
+    feedback_votes:
+
+      path: feedback_votes/{voteId}
+
+      schema:
+
+        postId: string
+        userId: string
+
+security:
+
+  firestore_rules:
+
+    parent:
+
+      can:
+
+        - create_own_posts
+        - edit_own_posts
+        - create_replies
+
+    founder:
+
+      can:
+
+        - pin
+        - resolve
+        - moderate
+
+    admin:
+
+      can:
+
+        - full_access
+
+events:
+
+  FEEDBACK_POSTED:
+
+    actions:
+
+      - bunny_wave
+      - stars
+      - play_voice_thank_you
+
+  FOUNDER_REPLIED:
+
+    actions:
+
+      - notification_pulse
+      - bunny_excited
+
+notifications:
+
+  triggers:
+
+    - founder_reply
+    - thread_reply
+    - post_liked
+    - marked_resolved
+
+analytics:
+
+  collect:
+
+    - posts_per_day
+    - top_categories
+    - unresolved_threads
+    - average_response_time
+    - founder_response_rate
+
+insight_engine:
+
+  purpose:
+
+    Convert community feedback into product decisions
+
+  detect_patterns:
+
+    - multiplication_confusion
+    - onboarding_confusion
+    - ui_feedback
+    - feature_requests
+
+acceptance_tests:
+
+  feed:
+
+    - authenticated_access_required
+    - newest_posts_render
+    - pinned_posts_first
+
+  create_post:
+
+    - validation_works
+    - screenshot_upload_works
+    - unauthorized_blocked
+
+  replies:
+
+    - founder_badge_visible
+    - resolved_state_updates
+    - notifications_sent
+
+implementation:
+
+  sprint_1:
+
+    - firestore_models
+    - create_post_page
+    - feed_page
+    - replies
+    - founder_badges
+
+  sprint_2:
+
+    - notifications
+    - bookmarks
+    - trending
+
+  sprint_3:
+
+    - ai_clustering
+    - insight_dashboard
