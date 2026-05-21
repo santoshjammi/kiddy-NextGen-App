@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node -e \"const fs=require('fs');if(fs.existsSync('out/index.html')){console.log('Pre-built out/ already committed — skipping next build on Hostinger');}else{require('child_process').execSync('next build',{stdio:'inherit'});}\"",
-    "start": "node server.js",
+    "build": "next build",
+    "start": "next start",
+    "start:static": "node server.js",
     "lint": "next lint",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
