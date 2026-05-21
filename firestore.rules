@@ -60,5 +60,15 @@ service cloud.firestore {
       allow delete: if request.auth != null
           && resource.data.userId == request.auth.uid;
     }
+
+    match /feedback_bookmarks/{bookmarkId} {
+      allow read: if request.auth != null
+          && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null
+          && request.resource.data.userId == request.auth.uid
+          && request.resource.data.postId is string;
+      allow delete: if request.auth != null
+          && resource.data.userId == request.auth.uid;
+    }
   }
 }
