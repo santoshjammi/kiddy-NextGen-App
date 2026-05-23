@@ -17,43 +17,37 @@ export default function ContactPage() {
       bestFor: 'Game issues, browser problems, technical difficulties'
     },
     {
-      title: 'Privacy & Legal',
+      title: 'Privacy & Account Deletion',
       email: 'countrysnews@gmail.com',
       responseTime: 'Within 48 hours',
-      bestFor: 'Privacy concerns, data questions, legal matters'
+      bestFor: 'Privacy concerns, data questions, account deletion requests'
     },
-    {
-      title: 'Educators & Schools',
-      email: 'countrysnews@gmail.com',
-      responseTime: 'Within 24 hours',
-      bestFor: 'Classroom use, educational partnerships, bulk access'
-    }
   ];
 
   const faqs = [
     {
-      q: 'How do I access the games?',
-      a: 'All our games are available directly on our website without registration. Simply click on any game from the main page to start playing!'
+      q: 'How do I access the activities?',
+      a: 'Most activities are free and playable instantly — no sign-in needed to explore. Sign in with your Google account to save progress, earn rewards, and unlock the full Learning Path with a Premium plan.'
     },
     {
       q: 'Is my child\'s progress saved?',
-      a: 'Yes! Game progress is automatically saved on your device using local storage. No personal information is sent to our servers.'
+      a: 'When you\'re signed in, progress is saved securely to your account in the cloud via Firebase. This powers the Parent Dashboard and keeps difficulty adaptive across devices.'
     },
     {
-      q: 'Do the games work on tablets and phones?',
-      a: 'Absolutely! Our games are designed to work on computers, tablets, and smartphones with touch controls optimized for each device.'
+      q: 'Do the activities work on tablets and phones?',
+      a: 'Yes — all activities are designed for computers, tablets, and smartphones with touch controls optimised for each device.'
     },
     {
-      q: 'What ages are the games suitable for?',
-      a: 'Our games are designed for children ages 3-6, covering preschool and kindergarten learning levels. Content is age-appropriate and educational.'
+      q: 'What ages are the activities suitable for?',
+      a: 'Kiddy is designed for children ages 4\u20139, covering pre-school foundations through early primary school maths and English. Each activity has multiple difficulty levels that adapt as your child improves.'
     },
     {
-      q: 'Do I need internet to play?',
-      a: 'You need internet to initially load the games, but once loaded, many features work offline. For the best experience, we recommend staying connected.'
+      q: 'What does the Premium plan include?',
+      a: 'Premium (\u20b9299/month) unlocks the full 14-step Learning Path, the \u201cRecommended Today\u201d and \u201cNeeds Practice\u201d sections on the Parent Dashboard, and priority access to new content.'
     },
     {
-      q: 'Can teachers use these in classrooms?',
-      a: 'Yes! Teachers and educators are welcome to use our games in classrooms. Contact us at countrysnews@gmail.com for more information.'
+      q: 'How can I give feedback?',
+      a: 'The fastest way is the Community page — the founder reads and replies to every post. You can also email us at countrysnews@gmail.com.'
     }
   ];
 
@@ -70,13 +64,22 @@ export default function ContactPage() {
 
       <div className="max-w-5xl mx-auto px-6 py-16">
         {/* Hero */}
-        <div className="mb-16">
+        <div className="mb-10">
           <h1 className="text-[54px] font-light text-black leading-tight tracking-[-0.1px] mb-6">
             Contact Us
           </h1>
           <p className="text-[18px] text-[#6b6b6b] font-light leading-relaxed max-w-2xl">
-            Have questions, feedback, or need help with our educational games? We&apos;re here to help.
+            Have a question or feedback? The quickest way to reach us is the Community page — the founder reads every post and replies directly.
           </p>
+        </div>
+
+        {/* Community pointer */}
+        <div className="mb-16 bg-[#f0f7ff] border border-[#bfdbfe] rounded-[24px] p-7 flex items-center justify-between gap-6 flex-wrap">
+          <div>
+            <h2 className="text-[20px] font-semibold text-black mb-1">Got feedback or a question?</h2>
+            <p className="text-sm text-[#6b6b6b]">Post in the Community — the founder reads and replies to every message personally.</p>
+          </div>
+          <Link href="/community" className="ps-btn shrink-0">Go to Community →</Link>
         </div>
 
         {/* Contact Methods */}

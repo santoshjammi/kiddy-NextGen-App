@@ -4,142 +4,151 @@ import Link from 'next/link';
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Nav */}
+    <div className="min-h-screen bg-[#f5f7fa]">
+      {/* Header */}
       <header className="bg-black sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="ps-btn ps-btn-sm ps-btn-ghost-dark">← Home</Link>
           <span className="text-white font-light text-lg">Privacy Policy</span>
           <div className="w-24" />
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-6 py-16">
-        <h1 className="text-[54px] font-light text-black leading-tight tracking-[-0.1px] mb-6">
+      <div className="max-w-3xl mx-auto px-6 py-16">
+        <h1 className="text-[42px] font-light text-black leading-tight mb-2">
           Privacy Policy
         </h1>
-          {/* Last Updated Info */}
-          <div className="bg-indigo-50 rounded-2xl p-6 text-sm text-indigo-800 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p><strong className="text-indigo-900">Last updated:</strong> August 20, 2025</p>
-              <p><strong className="text-indigo-900">Reviewed by:</strong> Dr. Sarah Mitchell, Child Privacy Specialist</p>
-            </div>
-            <div>
-              <p><strong className="text-indigo-900">COPPA Certification:</strong> Current and compliant</p>
-              <p><strong className="text-indigo-900">Legal Review:</strong> Children&apos;s Digital Privacy Law Firm</p>
+        <p className="text-sm text-[#6b6b6b] mb-12">Last updated: May 2026</p>
+
+        <div className="flex flex-col gap-8">
+
+          {/* 1. Who we are */}
+          <div className="bg-white rounded-[24px] p-8" style={{ boxShadow: 'rgba(0,0,0,0.07) 0 4px 8px 0' }}>
+            <h2 className="text-[22px] font-semibold text-black mb-3">Who We Are</h2>
+            <p className="text-sm text-[#1f1f1f] leading-relaxed">
+              Kiddy Learning Hub is a structured learning platform for children ages 4–9, helping them build foundations in maths and English through short daily practice sessions. The platform is operated by an independent founder — not a corporation. Questions about this policy can be sent to{' '}
+              <a href="mailto:countrysnews@gmail.com" className="text-[#0070cc] hover:underline">countrysnews@gmail.com</a>.
+            </p>
+          </div>
+
+          {/* 2. What we collect */}
+          <div className="bg-white rounded-[24px] p-8" style={{ boxShadow: 'rgba(0,0,0,0.07) 0 4px 8px 0' }}>
+            <h2 className="text-[22px] font-semibold text-black mb-4">What We Collect</h2>
+            <p className="text-sm text-[#6b6b6b] mb-6">We collect only what is needed to provide a personalised learning experience.</p>
+            <div className="flex flex-col gap-6">
+              <div>
+                <h3 className="text-sm font-semibold text-black mb-2">When you sign in with Google (optional)</h3>
+                <ul className="text-sm text-[#1f1f1f] leading-relaxed space-y-1.5 pl-3">
+                  <li>• Your name, email address, and profile photo — provided by Google.</li>
+                  <li>• We do not store your password. Authentication is handled entirely by Google Firebase.</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-black mb-2">Your child&apos;s learning data (stored in Firebase Firestore, linked to your account)</h3>
+                <ul className="text-sm text-[#1f1f1f] leading-relaxed space-y-1.5 pl-3">
+                  <li>• Progress per subject — mastery score, current difficulty level.</li>
+                  <li>• Session history — subject practised, duration in minutes, date.</li>
+                  <li>• Rewards — points earned, badges unlocked, streak count.</li>
+                  <li>• Community posts and replies, if you use the community feature.</li>
+                  <li>• Screenshot images uploaded to community posts (stored in Firebase Storage).</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-black mb-2">Anonymous usage data (Google Analytics)</h3>
+                <ul className="text-sm text-[#1f1f1f] leading-relaxed space-y-1.5 pl-3">
+                  <li>• Page views, device type, country — not linked to your account.</li>
+                </ul>
+              </div>
             </div>
           </div>
 
-          {/* Expert Protection Section */}
-          <section>
-            <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-              <span className="text-3xl">🛡️</span> Expert-Designed Privacy Protection
-            </h2>
-            <p className="text-gray-700 leading-relaxed mb-6">
-              At Kiddy Learning Hub, child privacy protection is designed and overseen by <strong className="text-indigo-600">Dr. Sarah Mitchell, PhD in Early Childhood Education</strong> and certified COPPA compliance specialist with 15+ years of experience in child development and digital safety.
+          {/* 3. What we don't collect */}
+          <div className="bg-white rounded-[24px] p-8" style={{ boxShadow: 'rgba(0,0,0,0.07) 0 4px 8px 0' }}>
+            <h2 className="text-[22px] font-semibold text-black mb-4">What We Don&apos;t Collect</h2>
+            <ul className="text-sm text-[#1f1f1f] leading-relaxed space-y-3">
+              <li className="flex gap-2"><span className="text-green-600 shrink-0">✓</span> We do not collect children&apos;s personal information directly — parents create and manage accounts.</li>
+              <li className="flex gap-2"><span className="text-green-600 shrink-0">✓</span> We do not run ads or sell data to advertisers. Kiddy is funded by subscriptions only.</li>
+              <li className="flex gap-2"><span className="text-green-600 shrink-0">✓</span> We do not store payment card details — payments are processed securely by Stripe.</li>
+              <li className="flex gap-2"><span className="text-green-600 shrink-0">✓</span> We do not share your data with third parties beyond what is listed in this policy.</li>
+            </ul>
+          </div>
+
+          {/* 4. How we use your data */}
+          <div className="bg-white rounded-[24px] p-8" style={{ boxShadow: 'rgba(0,0,0,0.07) 0 4px 8px 0' }}>
+            <h2 className="text-[22px] font-semibold text-black mb-4">How We Use Your Data</h2>
+            <ul className="text-sm text-[#1f1f1f] leading-relaxed space-y-3">
+              <li className="flex gap-2"><span className="text-[#0070cc] shrink-0">→</span> Power the Parent Dashboard — show progress stats, weekly consistency, and recommended focus areas.</li>
+              <li className="flex gap-2"><span className="text-[#0070cc] shrink-0">→</span> Track learning streaks and award badges as your child reaches milestones.</li>
+              <li className="flex gap-2"><span className="text-[#0070cc] shrink-0">→</span> Adapt difficulty automatically as your child improves.</li>
+              <li className="flex gap-2"><span className="text-[#0070cc] shrink-0">→</span> Display and respond to community posts and feedback.</li>
+            </ul>
+          </div>
+
+          {/* 5. Children's privacy */}
+          <div className="bg-white rounded-[24px] p-8" style={{ boxShadow: 'rgba(0,0,0,0.07) 0 4px 8px 0' }}>
+            <h2 className="text-[22px] font-semibold text-black mb-3">Children&apos;s Privacy</h2>
+            <p className="text-sm text-[#1f1f1f] leading-relaxed">
+              Kiddy is used by children under the supervision of a parent or guardian. Parents — not children — create and manage accounts. We do not knowingly allow children under 13 to create accounts independently. If you believe a child has registered without parental consent, contact us and we will delete the account promptly.
             </p>
-            <div className="bg-white border-l-4 border-indigo-500 p-6 shadow-sm">
-              <h3 className="font-bold text-indigo-800 mb-3">👩‍🎓 Privacy Expert Credentials</h3>
-              <ul className="space-y-2 text-gray-600 text-sm">
-                <li className="flex items-center gap-2"><span>•</span> <span className="text-gray-800"><strong className="text-gray-800">Dr. Sarah Mitchell:</strong> PhD Early Childhood Education, UC Berkeley</span></li>
-                <li className="flex items-center gap-2"><span>•</span> <span className="text-gray-800"><strong className="text-gray-800">COPPA Certification:</strong> Children&apos;s Online Privacy Protection Act specialist</span></li>
-                <li className="flex items-center gap-2"><span>•</span> <span className="text-gray-800"><strong className="text-gray-800">Legal Advisory:</strong> Partnership with Children&apos;s Digital Rights Law Firm</span></li>
-                <li className="flex items-center gap-2"><span>•</span> <span className="text-gray-800"><strong className="text-gray-800">Regular Audits:</strong> Quarterly privacy assessments by independent experts</span></li>
-              </ul>
-            </div>
-          </section>
+          </div>
 
-          {/* Children's Privacy Section */}
-          <section className="bg-red-50 rounded-3xl p-8 border border-red-100">
-            <h2 className="text-3xl font-bold text-red-800 mb-6 flex items-center gap-3">
-              <span className="text-3xl">👶</span> Children&apos;s Privacy
-            </h2>
-            <p className="text-lg font-semibold text-red-700 mb-8">
-              We do NOT knowingly collect personal information from children under 13. Our games are designed to be safe and educational without requiring personal data collection.
+          {/* 6. Third parties */}
+          <div className="bg-white rounded-[24px] p-8" style={{ boxShadow: 'rgba(0,0,0,0.07) 0 4px 8px 0' }}>
+            <h2 className="text-[22px] font-semibold text-black mb-4">Third-Party Services</h2>
+            <div className="flex flex-col gap-3">
+              {[
+                { name: 'Firebase (Google)', role: 'Authentication and database hosting.', url: 'https://firebase.google.com/support/privacy' },
+                { name: 'Stripe', role: 'Subscription payment processing.', url: 'https://stripe.com/privacy' },
+                { name: 'Google Analytics', role: 'Anonymous usage statistics.', url: 'https://policies.google.com/privacy' },
+              ].map((t) => (
+                <div key={t.name} className="flex items-start gap-4 bg-[#f5f7fa] rounded-[12px] px-4 py-3">
+                  <span className="text-sm font-semibold text-black shrink-0 w-40">{t.name}</span>
+                  <span className="text-sm text-[#6b6b6b]">{t.role}{' '}
+                    <a href={t.url} target="_blank" rel="noopener noreferrer" className="text-[#0070cc] hover:underline">Privacy policy ↗</a>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 7. Data deletion */}
+          <div className="bg-white rounded-[24px] p-8" style={{ boxShadow: 'rgba(0,0,0,0.07) 0 4px 8px 0' }}>
+            <h2 className="text-[22px] font-semibold text-black mb-3">Your Rights &amp; Data Deletion</h2>
+            <p className="text-sm text-[#1f1f1f] leading-relaxed mb-3">
+              You can stop using Kiddy at any time. To request deletion of all your account data, email{' '}
+              <a href="mailto:countrysnews@gmail.com?subject=Delete my account" className="text-[#0070cc] hover:underline">countrysnews@gmail.com</a>{' '}
+              with the subject <em>&quot;Delete my account&quot;</em>. We will process it within 7 days.
             </p>
-            <div className="grid md:grid-cols-2 gap-8">
-              <div>
-                <h3 className="font-bold text-red-800 mb-4">What we do:</h3>
-                <ul className="space-y-3 text-gray-700">
-                  <li className="flex items-center gap-2">✅ Provide educational games without requiring registration</li>
-                  <li className="flex items-center gap-2">✅ Use child-safe advertising through Google AdSense</li>
-                  <li className="flex items-center gap-2">✅ Comply with COPPA (Children&apos;s Online Privacy Protection Act)</li>
-                  <li className="flex items-center gap-2">✅ Monitor content to ensure it&apos;s appropriate for children</li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-bold text-red-800 mb-4">What we don&apos;t do:</h3>
-                <ul className="space-y-3 text-gray-700">
-                  <li className="flex items-center gap-2">❌ Collect names, addresses, or contact information</li>
-                  <li className="flex items-center gap-2">❌ Ask children for personal information to play</li>
-                  <li className="flex items-center gap-2">❌ Share children&apos;s information with third parties</li>
-                  <li className="flex items-center gap-2">❌ Use tracking cookies for children under 13</li>
-                </ul>
-              </div>
-            </div>
-          </section>
+            <p className="text-sm text-[#6b6b6b]">Google Analytics data is anonymised and cannot be individually deleted.</p>
+          </div>
 
-          {/* Information Collected */}
-          <section>
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">📊 Information We Collect</h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="space-y-4">
-                <h3 className="font-bold text-indigo-600 text-lg">Automatically Collected:</h3>
-                <ul className="space-y-2 text-gray-600">
-                  <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" /> <span className="text-gray-800"><strong className="text-gray-800">Usage Analytics:</strong> Anonymous Google Analytics usage data.</span></li>
-                  <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" /> <span className="text-gray-800"><strong className="text-gray-800">Technical Info:</strong> Browser/device type for optimal performance.</span></li>
-                  <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" /> <span className="text-gray-800"><strong className="text-gray-800">Game Progress:</strong> Stored <strong className="text-indigo-600">locally on your device only</strong>.</span></li>
-                </ul>
-              </div>
-              <div className="space-y-4">
-                <h3 className="font-bold text-indigo-600 text-lg">Advertising Information:</h3>
-                <ul className="space-y-2 text-gray-600">
-                  <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" /> <span className="text-gray-800"><strong className="text-gray-800">Ad Serving:</strong> Google AdSense may use cookies for age-appropriate ads.</span></li>
-                  <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" /> <span className="text-gray-800"><strong className="text-gray-800">Ad Personalization:</strong> Can be disabled in your browser settings.</span></li>
-                </ul>
-              </div>
-            </div>
-          </section>
-
-          {/* Cookies Section */}
-          <section className="bg-gray-50 p-8 rounded-2xl">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">🍪 Cookies and Tracking</h2>
-            <p className="text-gray-600 mb-6">We use minimal cookies only for essential functions like game progress saving, basic analytics, and displaying appropriate ads.</p>
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-              <p className="font-semibold text-gray-700 mb-2">Parents can:</p>
-              <ul className="list-disc list-inside text-gray-600 space-y-1">
-                <li>Disable cookies in browser settings</li>
-                <li>Use incognito/private browsing mode</li>
-                <li>Clear browser data at any time</li>
-              </ul>
-            </div>
-          </section>
-
-          {/* Contact Section */}
-          <section className="text-center py-10">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">📧 Privacy Questions?</h2>
-            <p className="text-gray-600 mb-6">If you have questions about this policy or our practices, please contact us.</p>
-            <a 
-              href="mailto:countrysnews@gmail.com?subject=Privacy Policy Question"
-              className="inline-block bg-indigo-600 text-white px-8 py-3 rounded-full font-bold hover:bg-indigo-700 transition-colors shadow-lg"
+          {/* 8. Questions */}
+          <div className="bg-[#f0f7ff] border border-[#bfdbfe] rounded-[24px] p-8 text-center">
+            <h2 className="text-[22px] font-semibold text-black mb-2">Questions?</h2>
+            <p className="text-sm text-[#6b6b6b] mb-5">We&apos;re happy to answer any questions about how your data is handled.</p>
+            <a
+              href="mailto:countrysnews@gmail.com?subject=Privacy Question"
+              className="ps-btn inline-flex"
             >
-              Email Us Directly
+              Email Us →
             </a>
-          </section>
-
-        {/* Footer */}
-        <footer className="bg-gray-50 p-8 text-center border-t">
-          <div className="flex flex-wrap justify-center gap-6 mb-6 text-sm font-medium text-gray-600">
-            <Link href="/" className="hover:text-indigo-600">🏠 Home</Link>
-            <Link href="/about" className="hover:text-indigo-600">ℹ️ About</Link>
-            <Link href="/contact" className="hover:text-indigo-600">📧 Contact</Link>
-            <Link href="/terms-of-service" className="hover:text-indigo-600">📋 Terms</Link>
           </div>
-          <p className="text-gray-400 text-xs">
-            &copy; 2025 Kiddy Learning Hub. Protecting children&apos;s privacy since 2025.
-          </p>
-        </footer>
+
+        </div>
       </div>
+
+      {/* Footer */}
+      <footer style={{ backgroundColor: '#003791' }} className="text-white py-10 mt-16">
+        <div className="max-w-5xl mx-auto px-6 flex flex-wrap justify-between items-center gap-4">
+          <span className="font-light">Kiddy Learning Hub</span>
+          <div className="flex gap-8 text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
+            <Link href="/" className="hover:text-white transition-colors">Home</Link>
+            <Link href="/about" className="hover:text-white transition-colors">About</Link>
+            <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
+            <Link href="/terms-of-service" className="hover:text-white transition-colors">Terms</Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
