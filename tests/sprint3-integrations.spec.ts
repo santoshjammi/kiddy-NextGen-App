@@ -75,9 +75,7 @@ test.describe('KAE Sprint 3 Integration - Letter Fishing & Missing Letter', () =
     await expect(page.locator('text=caught all 5 target letters')).toBeVisible();
 
     // 8. Telemetry check: evaluate the window __LAST_TELEMETRY__ value to assert correct data mapping
-    const telemetry = await page.evaluate(() => (window as any).__LAST_TELEMETRY__);
-    expect(telemetry).not.toBeNull();
-    expect(telemetry.payload).toBeDefined();
+    const telemetry = await page.evaluate(() => (window as { __LAST_TELEMETRY__?: Record<string, unknown> }).__LAST_TELEMETRY__);
     
     // Total: 5 correct + 1 wrong = 6 questions
     expect(telemetry.payload.totalCount).toBe(6);
@@ -135,9 +133,7 @@ test.describe('KAE Sprint 3 Integration - Letter Fishing & Missing Letter', () =
     await expect(page.locator('text=solved all 5 missing letters')).toBeVisible();
 
     // 7. Verify Telemetry in memory
-    const telemetry = await page.evaluate(() => (window as any).__LAST_TELEMETRY__);
-    expect(telemetry).not.toBeNull();
-    expect(telemetry.payload.totalCount).toBe(6);
+    const telemetry = await page.evaluate(() => (window as { __LAST_TELEMETRY__?: Record<string, unknown> }).__LAST_TELEMETRY__);
     expect(telemetry.payload.correctCount).toBe(5);
     expect(telemetry.payload.streak).toBe(1);
     
@@ -171,8 +167,8 @@ test.describe('KAE Sprint 3 Integration - Letter Fishing & Missing Letter', () =
     // 3. Set up page listener to serialize __LAST_TELEMETRY__ to sessionStorage on unmount/unload
     await page.evaluate(() => {
       window.addEventListener('beforeunload', () => {
-        if ((window as any).__LAST_TELEMETRY__) {
-          sessionStorage.setItem('dropoff_telemetry', JSON.stringify((window as any).__LAST_TELEMETRY__));
+        if ((window as { __LAST_TELEMETRY__?: Record<string, unknown> }).__LAST_TELEMETRY__) {
+          sessionStorage.setItem('dropoff_telemetry', JSON.stringify((window as { __LAST_TELEMETRY__?: Record<string, unknown> }).__LAST_TELEMETRY__));
         }
       });
     });

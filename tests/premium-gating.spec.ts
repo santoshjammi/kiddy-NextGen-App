@@ -112,7 +112,6 @@ test.describe('PREM — Premium Gating', () => {
     await page.waitForLoadState('networkidle');
 
     // Must NOT see actual learning path content
-    const premiumContent = page.locator('[data-testid="learning-path-content"]');
     // Either gated by redirect or overlay — either way no bypass
     const upgradeText = page.locator('text=Upgrade, text=Premium');
     await expect(upgradeText.first()).toBeVisible({ timeout: 8000 });
