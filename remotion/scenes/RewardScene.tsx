@@ -9,7 +9,6 @@ interface RewardSceneProps {
 }
 
 export const RewardScene: React.FC<RewardSceneProps> = ({
-  world,
   mascot = 'bunny',
 }) => {
   const frame = useCurrentFrame();

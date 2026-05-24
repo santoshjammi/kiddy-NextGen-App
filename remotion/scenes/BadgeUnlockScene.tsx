@@ -11,7 +11,6 @@ interface BadgeUnlockSceneProps {
 }
 
 export const BadgeUnlockScene: React.FC<BadgeUnlockSceneProps> = ({
-  world,
   mascot = 'bunny',
 }) => {
   const frame = useCurrentFrame();

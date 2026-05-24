@@ -144,7 +144,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({
       setTimeout(() => setMascotCompanionExpression('idle'), 1500);
     };
 
-    const handleCorrectAnswer = (payload: EventPayload) => {
+    const handleCorrectAnswer = () => {
       if (animationTimerRef.current) clearTimeout(animationTimerRef.current);
       
       setIsPlayingAnimation(true);
@@ -216,7 +216,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({
       setTimeout(() => setIsPlayingAnimation(false), SCENE_REGISTRY.reward_unlock.durationSeconds * 1000);
     };
 
-    const handleBadgeUnlock = (payload: EventPayload) => {
+    const handleBadgeUnlock = () => {
       if (animationTimerRef.current) clearTimeout(animationTimerRef.current);
 
       setIsPlayingAnimation(true);
@@ -297,7 +297,7 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({
       unsubBadge();
       unsubSessionComplete();
     };
-  }, []);
+  }, [gameId, subject, user]);
 
   if (!mounted) {
     return (

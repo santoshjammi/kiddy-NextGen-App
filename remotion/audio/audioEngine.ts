@@ -76,7 +76,7 @@ class AudioEngine {
       // Create high-quality procedural synthetic sound effects using Web Audio API!
       // This is extremely premium because it works instantly with zero loading lag, 
       // zero external dependencies, and sounds exactly like classic arcade chimes!
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (!AudioCtx) return;
       
       const ctx = new AudioCtx();
@@ -149,6 +149,7 @@ class AudioEngine {
   }
 
   // Handle background ambient soundtrack matching the world
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   playBackgroundMusic(world: 'ocean' | 'farm' | 'jungle' | 'space') {
     if (typeof window === 'undefined' || this.isMuted) return;
     

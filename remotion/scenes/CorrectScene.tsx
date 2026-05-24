@@ -12,7 +12,6 @@ interface CorrectSceneProps {
 }
 
 export const CorrectScene: React.FC<CorrectSceneProps> = ({
-  world,
   mascot = 'bunny',
 }) => {
   const frame = useCurrentFrame();

@@ -10,7 +10,6 @@ interface WrongSceneProps {
 }
 
 export const WrongScene: React.FC<WrongSceneProps> = ({
-  world,
   mascot = 'bunny',
 }) => {
   const frame = useCurrentFrame();
