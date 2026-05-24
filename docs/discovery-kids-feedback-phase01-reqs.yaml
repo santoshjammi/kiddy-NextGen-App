@@ -1,0 +1,461 @@
+meta:
+
+  project: Kiddy
+  module: Child Feedback Expansion Pack
+  version: 1.0
+  status: approved
+  priority: P1
+  source: direct_child_feedback
+
+vision:
+
+  statement: >
+
+    Expand Kiddy beyond structured practice into
+    discovery, creativity, and challenge systems
+    based on direct child behavioral feedback.
+
+  principle:
+
+    children_do_not_request_features
+
+    children_reveal_missing_experiences
+
+goals:
+
+  - improve_retention
+
+  - increase_free_play_time
+
+  - create_exploration_loops
+
+  - create_visible_progress
+
+  - increase_learning_depth
+
+  - reduce_content_exhaustion
+
+themes:
+
+  structured_learning:
+
+    existing:
+
+      - MathEngine
+      - EnglishEngine
+      - CarryBorrow
+      - MissingLetter
+
+  creativity:
+
+    new:
+
+      - KiddyPaint
+
+  exploration:
+
+    new:
+
+      - IndiaExplorer
+
+  progression:
+
+    improvements:
+
+      - GameCompletionStatus
+      - ExtendedNumbers
+      - MemoryMatchExpansion
+
+modules:
+
+  game_completion_system:
+
+    priority: P0
+
+    purpose: >
+
+      Children need visible completion and achievement.
+
+    requirements:
+
+      progress_display:
+
+        location:
+
+          - home_game_cards
+          - game_details
+          - learning_path
+
+        format:
+
+          completed: total
+
+        examples:
+
+          - "3/10"
+
+          - "14/20"
+
+      progress_bar:
+
+        animated: true
+
+        color_mode:
+
+          start: low
+
+          end: reward
+
+      milestones:
+
+        25:
+          animation: bunny_encourage
+
+        50:
+          animation: bunny_jump
+
+        75:
+          animation: stars
+
+        100:
+          animation: reward_scene
+
+    firestore:
+
+      collection:
+
+        user_game_progress:
+
+      schema:
+
+        userId: string
+
+        gameId: string
+
+        completedLevels: number
+
+        totalLevels: number
+
+        percentage: number
+
+numbers_engine_expansion:
+
+  priority: P0
+
+  purpose: >
+
+    Expand current numbers content from 1–100
+    to 1–200 progression.
+
+  current:
+
+    max_number: 100
+
+  target:
+
+    max_number: 200
+
+  requirements:
+
+    progression:
+
+      level_1:
+
+        range:
+
+          start: 1
+          end: 25
+
+      level_2:
+
+        range:
+
+          start: 26
+          end: 50
+
+      level_3:
+
+        range:
+
+          start: 51
+          end: 100
+
+      level_4:
+
+        range:
+
+          start: 101
+          end: 150
+
+      level_5:
+
+        range:
+
+          start: 151
+          end: 200
+
+    features:
+
+      - voice_narration
+
+      - animated_number_cards
+
+      - visual_objects
+
+      - quiz_generation
+
+memory_match_expansion:
+
+  priority: P0
+
+  purpose: >
+
+    Increase challenge depth.
+
+  current_problem:
+
+    puzzle_variation_too_low
+
+  progression:
+
+    level_1:
+
+      cards: 6
+
+    level_2:
+
+      cards: 10
+
+    level_3:
+
+      cards: 14
+
+    level_4:
+
+      cards: 20
+
+  mobile:
+
+    layout:
+
+      rows: 4
+
+      columns: 5
+
+  rewards:
+
+    completion:
+
+      - bunny_dance
+
+      - confetti
+
+kiddy_paint:
+
+  priority: P1
+
+  route: /paint
+
+  purpose: >
+
+    Introduce low-friction creativity sandbox.
+
+  implementation:
+
+    technology:
+
+      - HTML5_canvas
+
+      - React
+
+      - javascript
+
+  tools:
+
+    include:
+
+      - brush
+
+      - eraser
+
+      - colors
+
+      - fill_bucket
+
+      - clear_canvas
+
+    exclude:
+
+      - layers
+
+      - shapes
+
+      - menus
+
+      - advanced_options
+
+  ui_rules:
+
+    giant_buttons: true
+
+    icon_only: true
+
+    max_tools_visible: 5
+
+  mascot_events:
+
+    DRAWING_STARTED:
+
+      - bunny_wave
+
+    DRAWING_COMPLETED:
+
+      - stars
+
+india_explorer:
+
+  priority: P1
+
+  route: /india-explorer
+
+  purpose: >
+
+    Geography discovery game for young children.
+
+  implementation:
+
+    type: interactive_discovery
+
+  gameplay:
+
+    level_1:
+
+      objective:
+
+        identify_india
+
+    level_2:
+
+      objective:
+
+        tap_state
+
+    level_3:
+
+      objective:
+
+        match_state_name
+
+    level_4:
+
+      objective:
+
+        state_capital
+
+  experience:
+
+    world: adventure
+
+    mascot: dino
+
+  animation:
+
+    sequence:
+
+      - dino_intro
+
+      - map_reveal
+
+      - state_glow
+
+      - reward
+
+  future:
+
+    extend:
+
+      - countries_of_world
+
+telemetry:
+
+  collect:
+
+    - paint_usage_time
+
+    - memory_match_retries
+
+    - geography_click_patterns
+
+    - completion_rate
+
+    - session_dropoff
+
+success_metrics:
+
+  retention:
+
+    target: "+25%"
+
+  creativity:
+
+    paint_usage_target: "20_percent"
+
+  challenge:
+
+    memory_match_completion: "80_percent"
+
+  progression:
+
+    game_completion_visibility: "100_percent"
+
+implementation:
+
+  sprint_1:
+
+    - completion_system
+
+    - progress_ui
+
+  sprint_2:
+
+    - numbers_1_to_200
+
+    - memory_match_expansion
+
+  sprint_3:
+
+    - kiddy_paint
+
+  sprint_4:
+
+    - india_explorer
+
+acceptance:
+
+  completion:
+
+    - progress_visible_everywhere
+
+  memory:
+
+    - 20_cards_mobile_safe
+
+  paint:
+
+    - no_drag_lag
+
+  geography:
+
+    - map_interactions_work
+
+future_warning:
+
+  avoid:
+
+    - textbook_style_geography
+
+    - static_flashcards
+
+    - too_many_paint_tools
+
+    - complex_menus

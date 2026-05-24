@@ -1,0 +1,243 @@
+map_system:
+
+  purpose: >
+
+    Teach children real geographic placement of
+    Indian states and union territories.
+
+    Preserve actual map relationships while making
+    interaction child-friendly.
+
+  implementation:
+
+    source:
+
+      type: SVG
+
+      requirement:
+
+        exact_state_boundaries
+
+        exact_union_territory_boundaries
+
+        scalable_vector
+
+        separate_clickable_paths
+
+    rendering:
+
+      framework:
+
+        react_svg
+
+      interaction:
+
+        each_state_clickable: true
+
+        touch_padding: 40px
+
+        mobile_first: true
+
+visual_design:
+
+  state_shapes:
+
+    preserve_geographic_structure: true
+
+    enlarge_small_states: true
+
+    smooth_edges: true
+
+    hover_behavior:
+
+      - soft_glow
+
+      - bounce
+
+  union_territories:
+
+    style:
+
+      outline_color: gold
+
+      glow: subtle
+
+interaction:
+
+  first_touch:
+
+    animation:
+
+      - state_glow
+
+      - dino_jump
+
+      - stars
+
+    narration:
+
+      template:
+
+        "This is {state}"
+
+  repeated_touch:
+
+    animation:
+
+      - mascot_wave
+
+    narration:
+
+      template:
+
+        "Welcome back to {state}"
+
+landmark_system:
+
+  Andhra_Pradesh:
+
+    map_location:
+
+      attach_to_state: true
+
+    visuals:
+
+      - mango_tree
+      - tiger_friend
+
+  Kerala:
+
+    visuals:
+
+      - coconut_tree
+      - elephant
+
+  Rajasthan:
+
+    visuals:
+
+      - camel
+      - palace
+
+  Telangana:
+
+    visuals:
+
+      - pearls
+      - charminar
+
+capital_learning:
+
+  approach:
+
+    city_marker_on_map
+
+  behavior:
+
+    state_selected:
+
+      - zoom_state
+
+      - show_city_pin
+
+      - animate_path
+
+      - travel_to_capital
+
+example:
+
+  Andhra_Pradesh:
+
+    sequence:
+
+      - child_taps_state
+
+      - Andhra_glows
+
+      - Dino_jumps
+
+      - Mango_tree_appears
+
+      - speech:
+
+            "Welcome to Andhra Pradesh"
+
+      - Amaravati_pin_appears
+
+      - curved_path_animation
+
+      - balloons
+
+      - speech:
+
+            "Let's visit Amaravati"
+
+camera:
+
+  default:
+
+      full_india_view
+
+  state_selected:
+
+      zoom_to_state
+
+  capital_selected:
+
+      zoom_to_city
+
+progression:
+
+  stage_1:
+
+      explore_map
+
+  stage_2:
+
+      tap_states
+
+  stage_3:
+
+      state_association
+
+  stage_4:
+
+      capital_visit
+
+  stage_5:
+
+      recall_games
+
+assets:
+
+  required:
+
+      india_map.svg
+
+      states:
+
+        separate_svg_paths: true
+
+      capital_markers:
+
+      clouds:
+
+      roads:
+
+      stickers:
+
+      mascot_assets:
+
+acceptance:
+
+  must:
+
+      preserve_real_india_layout
+
+      support_mobile_touch
+
+      enlarged_small_states_clickable
+
+      zoom_to_selected_state
+
+      teach_location_not_just_names

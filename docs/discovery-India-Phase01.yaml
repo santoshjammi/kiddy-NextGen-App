@@ -1,0 +1,210 @@
+meta:
+
+  project: Kiddy
+  module: Dino Treasure Hunt India
+  version: 1.0
+  status: approved
+  priority: P1
+
+vision:
+
+  statement: >
+
+    Transform India learning into a story-driven
+    adventure experience for children under age 6.
+
+    Children help Dino travel across India to recover
+    magical treasure stickers hidden across states.
+
+core_principles:
+
+  - exploration_before_memorization
+  - story_before_curriculum
+  - interaction_before_text
+  - rewards_everywhere
+  - curiosity_over_accuracy
+
+route:
+
+  path: /dino-treasure-hunt
+
+audience:
+
+  age: "4-6"
+
+mascot:
+
+  primary:
+
+    name: Dino Explorer
+
+    personality:
+
+      - adventurous
+      - curious
+      - energetic
+
+    voice_lines:
+
+      - Lets find treasure
+      - Wow a new place
+      - We found it
+      - Lets keep exploring
+
+story:
+
+  setup:
+
+    narrative: >
+
+      Dino lost magical treasure stickers
+      all around India.
+
+      Travel together and discover them.
+
+world:
+
+  map:
+
+    type: simplified_india
+
+    behavior:
+
+      - colorful
+      - oversized_states
+      - tap_interactions
+      - animated_glow
+
+progression:
+
+  level_1:
+
+    goal:
+
+      find_india
+
+    interaction:
+
+      - tap_india
+
+    reward:
+
+      - star_sticker
+
+  level_2:
+
+    goal:
+
+      discover_states
+
+    interactions:
+
+      - tap_state
+      - hear_name
+
+    rewards:
+
+      - state_sticker
+
+  level_3:
+
+    goal:
+
+      find_hidden_treasures
+
+    interactions:
+
+      - treasure_reveal
+      - mascot_hint
+
+  level_4:
+
+    goal:
+
+      match_state_names
+
+    interactions:
+
+      - drag_drop
+
+experience:
+
+  scene_sequence:
+
+    - DinoIntro
+    - TreasureMapReveal
+    - StateGlow
+    - DiscoveryAnimation
+    - RewardScene
+    - NextDestination
+
+animation:
+
+  DISCOVERY:
+
+    sequence:
+
+      - state_glow
+      - stars
+      - dino_jump
+
+  TREASURE_FOUND:
+
+    sequence:
+
+      - confetti
+      - reward_sticker
+      - celebration
+
+ui:
+
+  rules:
+
+    max_words_per_screen: 5
+
+    narration_required: true
+
+    giant_buttons: true
+
+    giant_touch_targets: true
+
+rewards:
+
+  stickers:
+
+    examples:
+
+      - tiger
+      - peacock
+      - elephant
+      - mango
+      - kite
+
+telemetry:
+
+  track:
+
+    - state_taps
+    - exploration_time
+    - repeated_interactions
+    - dropoff_location
+
+acceptance:
+
+  must:
+
+    - feel_like_adventure
+
+    - not_feel_like_school
+
+    - reward_every_30_seconds
+
+    - support_mobile
+
+future:
+
+  expansion:
+
+    - world_treasure_hunt
+    - ocean_treasure_hunt
+    - space_treasure_hunt
