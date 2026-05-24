@@ -40,10 +40,6 @@ export default function RhymingPage() {
   const [done, setDone] = useState(false);
 
   const current = questions[index];
-  const shuffledChoices = (selected === null)
-    ? shuffle(current.choices)
-    : current.choices;
-
   // Keep choices stable once shown
   const [displayChoices] = useState(() => questions.map(q => shuffle(q.choices)));
 

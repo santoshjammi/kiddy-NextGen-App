@@ -53,8 +53,8 @@ function generateProblem(level: number): Problem {
 }
 
 // ── Visual groups: render dividend items split into divisor groups ─
-function VisualGroups({ dividend, divisor, answer, emoji, revealed }: {
-  dividend: number; divisor: number; answer: number; emoji: string; revealed: boolean;
+function VisualGroups({ divisor, answer, emoji, revealed }: {
+  divisor: number; answer: number; emoji: string; revealed: boolean;
 }) {
   const groups = Array.from({ length: divisor }, (_, g) => (
     <div
@@ -179,7 +179,6 @@ export default function DivisionSplitterPage() {
 
           {/* Visual groups */}
           <VisualGroups
-            dividend={problem.dividend}
             divisor={problem.divisor}
             answer={problem.answer}
             emoji={problem.items}

@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   doc,
   getDoc,
@@ -222,7 +223,7 @@ function PostThread() {
               {post.body}
             </p>
             {post.screenshotUrl && (
-              <img
+              <Image
                 src={post.screenshotUrl}
                 alt="Screenshot"
                 className="mt-3 mb-2 max-h-80 rounded-[12px] object-contain border border-[#f3f3f3]"

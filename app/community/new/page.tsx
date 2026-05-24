@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   collection,
   addDoc,
@@ -195,7 +196,7 @@ export default function NewPostPage() {
                            cursor-pointer hover:border-[#0070cc] transition-colors"
               >
                 {screenshotPreview ? (
-                  <img src={screenshotPreview} alt="Preview" className="max-h-48 mx-auto rounded-[8px] object-contain" />
+                  <Image src={screenshotPreview} alt="Preview" className="max-h-48 mx-auto rounded-[8px] object-contain" />
                 ) : (
                   <p className="text-sm text-[#6b6b6b]">📎 Click to attach a screenshot</p>
                 )}

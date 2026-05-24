@@ -11,8 +11,7 @@ import { useRewards } from '../../components/useRewards';
 // Set this to true after running:  firebase deploy --only functions
 const RAZORPAY_BILLING_ENABLED = false;
 
-// Razorpay monthly plan amount in smallest currency unit (paise): ₹299 = 29900
-const RAZORPAY_AMOUNT_PAISE = 29900;
+
 
 const OUTCOME_TRACKS = [
   {
