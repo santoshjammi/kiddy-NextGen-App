@@ -2,34 +2,45 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useUserProgress } from '../../components/useUserProgress';
 
-const numberWords: Record<number, string> = {
-    1: 'One', 2: 'Two', 3: 'Three', 4: 'Four', 5: 'Five',
-    6: 'Six', 7: 'Seven', 8: 'Eight', 9: 'Nine', 10: 'Ten',
-    11: 'Eleven', 12: 'Twelve', 13: 'Thirteen', 14: 'Fourteen', 15: 'Fifteen',
-    16: 'Sixteen', 17: 'Seventeen', 18: 'Eighteen', 19: 'Nineteen', 20: 'Twenty',
-    21: 'Twenty-One', 22: 'Twenty-Two', 23: 'Twenty-Three', 24: 'Twenty-Four', 25: 'Twenty-Five',
-    26: 'Twenty-Six', 27: 'Twenty-Seven', 28: 'Twenty-Eight', 29: 'Twenty-Nine', 30: 'Thirty',
-    31: 'Thirty-One', 32: 'Thirty-Two', 33: 'Thirty-Three', 34: 'Thirty-Four', 35: 'Thirty-Five',
-    36: 'Thirty-Six', 37: 'Thirty-Seven', 38: 'Thirty-Eight', 39: 'Thirty-Nine', 40: 'Forty',
-    41: 'Forty-One', 42: 'Forty-Two', 43: 'Forty-Three', 44: 'Forty-Four', 45: 'Forty-Five',
-    46: 'Forty-Six', 47: 'Forty-Seven', 48: 'Forty-Eight', 49: 'Forty-Nine', 50: 'Fifty',
-    51: 'Fifty-One', 52: 'Fifty-Two', 53: 'Fifty-Three', 54: 'Fifty-Four', 55: 'Fifty-Five',
-    56: 'Fifty-Six', 57: 'Fifty-Seven', 58: 'Fifty-Eight', 59: 'Fifty-Nine', 60: 'Sixty',
-    61: 'Sixty-One', 62: 'Sixty-Two', 63: 'Sixty-Three', 64: 'Sixty-Four', 65: 'Sixty-Five',
-    66: 'Sixty-Six', 67: 'Sixty-Seven', 68: 'Sixty-Eight', 69: 'Sixty-Nine', 70: 'Seventy',
-    71: 'Seventy-One', 72: 'Seventy-Two', 73: 'Seventy-Three', 74: 'Seventy-Four', 75: 'Seventy-Five',
-    76: 'Seventy-Six', 77: 'Seventy-Seven', 78: 'Seventy-Eight', 79: 'Seventy-Nine', 80: 'Eighty',
-    81: 'Eighty-One', 82: 'Eighty-Two', 83: 'Eighty-Three', 84: 'Eighty-Four', 85: 'Eighty-Five',
-    86: 'Eighty-Six', 87: 'Eighty-Seven', 88: 'Eighty-Eight', 89: 'Eighty-Nine', 90: 'Ninety',
-    91: 'Ninety-One', 92: 'Ninety-Two', 93: 'Ninety-Three', 94: 'Ninety-Four', 95: 'Ninety-Five',
-    96: 'Ninety-Six', 97: 'Ninety-Seven', 98: 'Ninety-Eight', 99: 'Ninety-Nine', 100: 'One Hundred'
-};
+const LEVEL_RANGES: Array<{ label: string; start: number; end: number }> = [
+  { label: 'Level 1', start: 1, end: 25 },
+  { label: 'Level 2', start: 26, end: 50 },
+  { label: 'Level 3', start: 51, end: 100 },
+  { label: 'Level 4', start: 101, end: 150 },
+  { label: 'Level 5', start: 151, end: 200 },
+];
+
+const UNITS = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+const TEENS = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+const TENS = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+function numberToWords(n: number): string {
+  if (n === 0) return 'Zero';
+  if (n === 200) return 'Two Hundred';
+  if (n > 100) {
+    const hundreds = Math.floor(n / 100);
+    const remainder = n % 100;
+    const prefix = hundreds === 1 ? 'One Hundred' : `${UNITS[hundreds]} Hundred`;
+    return remainder === 0 ? prefix : `${prefix} ${numberToWords(remainder)}`;
+  }
+  if (n < 10) return UNITS[n];
+  if (n < 20) return TEENS[n - 10];
+  const ten = Math.floor(n / 10);
+  const unit = n % 10;
+  return unit === 0 ? TENS[ten] : `${TENS[ten]}-${UNITS[unit]}`;
+}
+
+const numberWords: Record<number, string> = {};
+for (let i = 1; i <= 200; i++) {
+  numberWords[i] = numberToWords(i);
+}
 
 export default function NumbersPage() {
     const [currentNumber, setCurrentNumber] = useState(1);
-    const [currentRange, setCurrentRange] = useState<[number, number]>([1, 10]);
+    const [currentLevel, setCurrentLevel] = useState(0);
     const [completedNumbers, setCompletedNumbers] = useState<Set<number>>(new Set());
     const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
     const { saveProgress: syncToFirebase } = useUserProgress('numbers');
@@ -45,7 +56,7 @@ export default function NumbersPage() {
         setCompletedNumbers(newCompleted);
         localStorage.setItem('kiddyHub_numbersCompleted', JSON.stringify([...newCompleted]));
         localStorage.setItem('kiddyHub_numbersProgress', newCompleted.size.toString());
-        syncToFirebase(Math.round((newCompleted.size / 100) * 100));
+        syncToFirebase(Math.round((newCompleted.size / 200) * 100));
     };
 
     const playNumberAudio = useCallback((num: number) => {
@@ -83,20 +94,19 @@ export default function NumbersPage() {
         const newCompleted = new Set(completedNumbers);
         newCompleted.add(num);
         saveProgress(newCompleted);
-        
+
         setTimeout(() => {
             playNumberAudio(num);
         }, 300);
     };
 
-    const changeRange = (direction: 'prev' | 'next' | 'select', value?: string) => {
-        if (direction === 'select' && value) {
-            const selectedRange = value.split('-').map(Number);
-            setCurrentRange([selectedRange[0], selectedRange[1]]);
-        } else if (direction === 'prev' && currentRange[0] > 1) {
-            setCurrentRange([currentRange[0] - 10, currentRange[1] - 10]);
-        } else if (direction === 'next' && currentRange[1] < 100) {
-            setCurrentRange([currentRange[0] + 10, currentRange[1] + 10]);
+    const changeLevel = (direction: 'prev' | 'next' | 'select', levelIdx?: number) => {
+        if (direction === 'select' && levelIdx !== undefined) {
+            setCurrentLevel(levelIdx);
+        } else if (direction === 'prev' && currentLevel > 0) {
+            setCurrentLevel(currentLevel - 1);
+        } else if (direction === 'next' && currentLevel < LEVEL_RANGES.length - 1) {
+            setCurrentLevel(currentLevel + 1);
         }
     };
 
@@ -104,24 +114,28 @@ export default function NumbersPage() {
         if (confirm('Are you sure you want to start over? This will reset all your progress!')) {
             setCompletedNumbers(new Set());
             setCurrentNumber(1);
-            setCurrentRange([1, 10]);
+            setCurrentLevel(0);
             localStorage.removeItem('kiddyHub_numbersCompleted');
             localStorage.removeItem('kiddyHub_numbersProgress');
         }
     };
 
     const selectRandomNumber = () => {
-        const randomNum = Math.floor(Math.random() * 100) + 1;
+        const range = LEVEL_RANGES[currentLevel];
+        const randomNum = Math.floor(Math.random() * (range.end - range.start + 1)) + range.start;
         selectNumber(randomNum);
     };
 
+    const range = LEVEL_RANGES[currentLevel];
     const numbersInGrid = useMemo(() => {
         const arr = [];
-        for (let i = currentRange[0]; i <= currentRange[1]; i++) {
+        for (let i = range.start; i <= range.end; i++) {
             arr.push(i);
         }
         return arr;
-    }, [currentRange]);
+    }, [range]);
+
+    const visualDotCount = currentNumber <= 50 ? currentNumber : 50;
 
     return (
         <div className="min-h-screen bg-black">
@@ -130,16 +144,16 @@ export default function NumbersPage() {
                 <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
                     <Link href="/" className="ps-btn ps-btn-sm ps-btn-ghost-dark">← Back</Link>
                     <div className="text-center">
-                        <h1 className="text-[22px] font-light text-white tracking-[0.1px]">Numbers 1–100</h1>
-                        <p className="text-[#6b6b6b] text-xs mt-0.5">Range {currentRange[0]}–{currentRange[1]}</p>
+                        <h1 className="text-[22px] font-light text-white tracking-[0.1px]">Numbers 1–200</h1>
+                        <p className="text-[#6b6b6b] text-xs mt-0.5">{range.label}: {range.start}–{range.end}</p>
                     </div>
                     <select
                         className="bg-[#1a1a1a] text-white border border-[#333] rounded-[6px] px-3 py-1.5 text-sm"
-                        value={`${currentRange[0]}-${currentRange[1]}`}
-                        onChange={(e) => changeRange('select', e.target.value)}
+                        value={currentLevel}
+                        onChange={(e) => changeLevel('select', parseInt(e.target.value))}
                     >
-                        {[ [1,10], [11,20], [21,30], [31,40], [41,50], [51,60], [61,70], [71,80], [81,90], [91,100] ].map(([start, end]) => (
-                            <option key={`${start}-${end}`} value={`${start}-${end}`}>{start}–{end}</option>
+                        {LEVEL_RANGES.map((lr, i) => (
+                            <option key={i} value={i}>{lr.label}: {lr.start}–{lr.end}</option>
                         ))}
                     </select>
                 </div>
@@ -152,10 +166,10 @@ export default function NumbersPage() {
                 <div className="mb-8">
                     <div className="flex justify-between text-sm text-[#6b6b6b] mb-2">
                         <span className="font-light">Progress</span>
-                        <span className="text-[#0070cc] font-semibold">{completedNumbers.size}/100</span>
+                        <span className="text-[#0070cc] font-semibold">{completedNumbers.size}/200</span>
                     </div>
                     <div className="ps-progress-track">
-                        <div className="ps-progress-fill" style={{ width: `${(completedNumbers.size / 100) * 100}%` }} />
+                        <div className="ps-progress-fill" style={{ width: `${(completedNumbers.size / 200) * 100}%` }} />
                     </div>
                 </div>
 
@@ -169,8 +183,8 @@ export default function NumbersPage() {
                             {numberWords[currentNumber]}
                         </div>
                         <div className="mt-6 h-32 flex items-center justify-center">
-                             <img 
-                                src={`/numbers_assets/${currentNumber}.webp`} 
+                             <Image
+                                src={`/numbers_assets/${currentNumber}.webp`}
                                 alt={numberWords[currentNumber]}
                                 className="max-h-full object-contain rounded-[12px]"
                                 onError={(e) => (e.currentTarget.style.display = 'none')}
@@ -179,25 +193,25 @@ export default function NumbersPage() {
                     </div>
 
                     <div className="space-y-4">
-                        <div className="bg-white rounded-[19px] p-4 border border-[#f3f3f3] min-h-[200px] flex flex-wrap items-center justify-center gap-2">
-                            {Array.from({ length: Math.min(currentNumber, 20) }).map((_, i) => (
-                                <div key={i} className="w-4 h-4 bg-[#0070cc] rounded-full" style={{ opacity: 0.7 + (i / 20) * 0.3 }}></div>
+                        <div className="bg-white rounded-[19px] p-4 border border-[#f3f3f3] min-h-[200px] flex flex-wrap items-center justify-center gap-1.5">
+                            {Array.from({ length: visualDotCount }).map((_, i) => (
+                                <div key={i} className="w-3.5 h-3.5 bg-[#0070cc] rounded-full" style={{ opacity: 0.5 + (i / visualDotCount) * 0.5 }}></div>
                             ))}
-                            {currentNumber > 20 && (
-                                <div className="text-[#0070cc] font-semibold text-lg">
-                                    ({Math.floor(currentNumber / 10)} tens &amp; {currentNumber % 10} ones)
+                            {currentNumber > 50 && (
+                                <div className="w-full text-center text-[#0070cc] font-semibold text-lg mt-2">
+                                    ({Math.floor(currentNumber / 10)} tens & {currentNumber % 10} ones)
                                 </div>
                             )}
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
-                            <button onClick={() => changeRange('prev')} disabled={currentRange[0] === 1}
+                            <button onClick={() => changeLevel('prev')} disabled={currentLevel === 0}
                                 className="ps-btn ps-btn-sm ps-btn-ghost">
-                                ← Prev Range
+                                ← Prev Level
                             </button>
-                            <button onClick={() => changeRange('next')} disabled={currentRange[1] === 100}
+                            <button onClick={() => changeLevel('next')} disabled={currentLevel === LEVEL_RANGES.length - 1}
                                 className="ps-btn ps-btn-sm ps-btn-ghost">
-                                Next Range →
+                                Next Level →
                             </button>
                         </div>
 
@@ -213,12 +227,16 @@ export default function NumbersPage() {
                 </div>
 
                 {/* Grid */}
-                <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-10 gap-2 md:gap-3 mb-8">
+                <div className={`grid gap-2 md:gap-3 mb-8 ${
+                    range.end - range.start > 50
+                        ? 'grid-cols-5 sm:grid-cols-5 md:grid-cols-10'
+                        : 'grid-cols-5 sm:grid-cols-5 md:grid-cols-5'
+                }`}>
                     {numbersInGrid.map((num) => (
                         <button
                             key={num}
                             onClick={() => selectNumber(num)}
-                            className={`ps-tile aspect-square text-lg md:text-xl ${
+                            className={`ps-tile aspect-square text-sm md:text-base ${
                                 currentNumber === num
                                     ? 'ps-tile-active'
                                     : completedNumbers.has(num)
